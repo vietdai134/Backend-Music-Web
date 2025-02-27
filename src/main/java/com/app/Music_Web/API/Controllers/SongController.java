@@ -21,17 +21,17 @@ public class SongController {
         this.findSongsByGenreService = findSongsByGenreService;
     }
 
-    @PostMapping
-    public SongResponse createSong(@RequestBody SongRequest request) {
-        SongDTO savedSong = saveSongService.saveSong(request.getTitle(), request.getArtist(), request.getGenre());
-        return new SongResponse(savedSong.getId(), savedSong.getTitle());
-    }
+    // @PostMapping
+    // public SongResponse createSong(@RequestBody SongRequest request) {
+    //     SongDTO savedSong = saveSongService.saveSong(request.getTitle(), request.getArtist(), request.getGenre());
+    //     return new SongResponse(savedSong.getId(), savedSong.getTitle());
+    // }
 
-    @GetMapping("/genre/{genre}")
-    public List<SongResponse> getSongsByGenre(@PathVariable String genre) {
-        List<SongDTO> songs = findSongsByGenreService.findSongsByGenre(genre);
-        return songs.stream()
-                    .map(song -> new SongResponse(song.getId(), song.getTitle()))
-                    .collect(Collectors.toList());
-    }
+    // @GetMapping("/genre/{genre}")
+    // public List<SongResponse> getSongsByGenre(@PathVariable String genre) {
+    //     List<SongDTO> songs = findSongsByGenreService.findSongsByGenre(genre);
+    //     return songs.stream()
+    //                 .map(song -> new SongResponse(song.getId(), song.getTitle()))
+    //                 .collect(Collectors.toList());
+    // }
 }

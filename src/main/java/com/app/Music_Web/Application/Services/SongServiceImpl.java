@@ -18,18 +18,18 @@ public class SongServiceImpl implements SaveSongService, FindSongsByGenreService
         this.songRepositoryPort = songRepositoryPort;
     }
 
-    @Override
-    public SongDTO saveSong(String title, String artist, String genre) {
-        Song song = new Song(title, artist, genre);
-        Song savedSong = songRepositoryPort.save(song);
-        return new SongDTO(savedSong.getId(), savedSong.getTitle(), savedSong.getArtist(), savedSong.getGenre());
-    }
+    // @Override
+    // public SongDTO saveSong(String title, String artist, String genre) {
+    //     Song song = new Song(title, artist, genre);
+    //     Song savedSong = songRepositoryPort.save(song);
+    //     return new SongDTO(savedSong.getId(), savedSong.getTitle(), savedSong.getArtist(), savedSong.getGenre());
+    // }
 
-    @Override
-    public List<SongDTO> findSongsByGenre(String genre) {
-        List<Song> songs = songRepositoryPort.findByGenre(genre);
-        return songs.stream()
-                    .map(song -> new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getGenre()))
-                    .collect(Collectors.toList());
-    }
+    // @Override
+    // public List<SongDTO> findSongsByGenre(String genre) {
+    //     List<Song> songs = songRepositoryPort.findByGenre(genre);
+    //     return songs.stream()
+    //                 .map(song -> new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getGenre()))
+    //                 .collect(Collectors.toList());
+    // }
 }

@@ -4,5 +4,5 @@ import com.app.Music_Web.Application.DTO.SongDTO;
 import java.util.List;
 
 public interface FindSongsByGenreService {
-    List<SongDTO> findSongsByGenre(String genre);
+    // List<SongDTO> findSongsByGenre(String genre);
 }
