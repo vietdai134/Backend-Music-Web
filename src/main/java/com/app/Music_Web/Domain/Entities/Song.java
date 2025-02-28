@@ -74,4 +74,8 @@ public class Song {
     //liên kết 1-n với bảng ListeningHistory
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<ListenHistory> listeningHistories=new ArrayList<>();
+
+    //liên kết 1-n với bảng SongGenre
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
+    private List<SongGenre> songGenres=new ArrayList<>();
 }

@@ -26,10 +26,10 @@ public class UserAuth {
     @Column(name = "auth_id")
     private Long authId;
 
-    @Column(nullable = false,name = "google_id")
+    @Column(nullable = true,name = "google_id")
     private String googleId;
 
-    @Column(nullable = false,name = "facebook_id")
+    @Column(nullable = true,name = "facebook_id")
     private String facebookId;
 
     @Column(nullable = false,name="refresh_token")
