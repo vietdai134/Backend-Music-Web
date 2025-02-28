@@ -33,6 +33,7 @@ public class Permission {
     @Column(name="description",nullable = false)
     private String description;
 
+    //liên kết 1-n với bảng RolePermission
     @OneToMany(mappedBy = "permission")
     private List<RolePermission> rolePermissions=new ArrayList<>();
 }

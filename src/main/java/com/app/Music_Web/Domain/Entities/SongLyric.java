@@ -28,6 +28,7 @@ public class SongLyric {
     @Column(name="lyric",nullable = true)
     private String lyric;
 
+    //khóa ngoại liên kết đến bảng Song
     @OneToOne
     @JoinColumn(name = "song_id")
     private Song song;

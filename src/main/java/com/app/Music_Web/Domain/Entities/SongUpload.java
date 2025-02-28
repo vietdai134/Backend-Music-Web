@@ -33,10 +33,12 @@ public class SongUpload {
     @Column(name="upload_date",nullable = false)
     private Date uploadDate;
 
+    //khóa ngoại liên kết đến bảng User
     @ManyToOne
     @JoinColumn(name = "uploaded_by",nullable = false)
     private User user;
 
+    //khóa ngoại liên kết đến bảng Song
     @ManyToOne
     @JoinColumn(name = "song_id",nullable = false)
     private Song song;

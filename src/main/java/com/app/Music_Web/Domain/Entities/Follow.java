@@ -37,6 +37,7 @@ public class Follow {
     @JoinColumn(name = "follower_id",nullable = false)
     private User follower;
 
+    //khóa ngoại liên kết đến bảng User
     @ManyToOne
     @JoinColumn(name = "followed_id",nullable = false)
     private User followed;

@@ -23,6 +23,7 @@ public class UserStatus {
     @Column(nullable = false,name = "is_active")
     private boolean isActive;
     
+    //khóa ngoại liên kết đến bảng User
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
     private User user;

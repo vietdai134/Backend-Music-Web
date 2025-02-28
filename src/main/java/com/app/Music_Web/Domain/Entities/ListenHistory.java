@@ -33,10 +33,12 @@ public class ListenHistory {
     @Column(name="listened_date",nullable = false)
     private Date listenedDate;
 
+    //khóa ngoại liên kết đến bảng Song
     @ManyToOne
     @JoinColumn(name = "song_id",nullable = false)
     private Song song;
     
+    //khóa ngoại liên kết đến bảng User
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
     private User user;

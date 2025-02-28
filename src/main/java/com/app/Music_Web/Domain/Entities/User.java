@@ -76,7 +76,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<LikedSong> likedSongs=new ArrayList<>();
 
-    //liên kết 1-n với bảng likedSong
+    //liên kết 1-n với bảng listenHistory
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<ListenHistory> listeningHistories=new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class User {
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<Follow> followedLists=new ArrayList<>();
 
-    //liên kết 1-n với bảng follow
+    //liên kết 1-n với bảng userRole
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<UserRole> userRoles=new ArrayList<>();
 }

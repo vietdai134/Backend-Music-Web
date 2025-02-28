@@ -39,6 +39,7 @@ public class RolePermission {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    //khóa ngoại liên kết với bảng permission
     @ManyToOne
     @JoinColumn(name = "permission_id")
     private Permission permission;

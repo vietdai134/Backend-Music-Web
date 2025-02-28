@@ -4,6 +4,6 @@ import com.app.Music_Web.Domain.Entities.Song;
 import java.util.List;
 
 public interface SongRepositoryPort {
-    Song save(Song song);          
-    List<Song> findByGenre(String genre); // Trả về Song, sẽ được chuyển sang DTO trong Service
+    // Song save(Song song);          
+    
 }

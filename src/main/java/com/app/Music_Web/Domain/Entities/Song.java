@@ -35,9 +35,6 @@ public class Song {
     @Column(name="artist",nullable = false)
     private String artist;
 
-    @Column(name="genre",nullable = false)
-    private String genre;
-
     @Column(name="song_image",nullable = false)
     private String songImage;
 
@@ -51,7 +48,7 @@ public class Song {
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<SongUpload> songUploads=new ArrayList<>();
 
-    //liên kết 1-n với bảng SongUpload
+    //liên kết 1-n với bảng SongApproval
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<SongApproval> songApprovals=new ArrayList<>();
 
@@ -63,7 +60,7 @@ public class Song {
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<AlbumSong> albumSongs=new ArrayList<>();
 
-    //liên kết 1-n với bảng AlbumSong
+    //liên kết 1-n với bảng PlaylistSong
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<PlaylistSong> playlistSongs=new ArrayList<>();
 

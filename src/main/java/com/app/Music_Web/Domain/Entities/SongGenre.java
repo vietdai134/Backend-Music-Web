@@ -23,10 +23,12 @@ public class SongGenre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //khóa ngoại liên kết đến bảng Song
     @ManyToOne
     @JoinColumn(name = "song_id",nullable = false)
     private Song song;
 
+    //khóa ngoại liên kết đến bảng Genre
     @ManyToOne
     @JoinColumn(name = "genre_id",nullable = false)
     private Genre genre;

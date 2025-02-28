@@ -36,10 +36,12 @@ public class SongApproval {
     @Column(name="approved_date",nullable = false)
     private Date approvedDate;
 
+    //khóa ngoại liên kết đến bảng User
     @ManyToOne
     @JoinColumn(name = "approved_by",nullable = false)
     private User user;
     
+    //khóa ngoại liên kết đến bảng Song
     @ManyToOne
     @JoinColumn(name = "song_id",nullable = false)
     private Song song;
