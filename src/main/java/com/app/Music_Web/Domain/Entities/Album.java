@@ -1,11 +1,13 @@
 package com.app.Music_Web.Domain.Entities;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.app.Music_Web.Domain.ValueObjects.Album.AlbumName;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -33,8 +35,8 @@ public class Album {
     @Column(name="album_id")
     private Long albumId;
 
-    @Column(name="album_name",nullable = false)
-    private String albumName;
+    @Embedded
+    private AlbumName albumName;
 
     @Column(name="album_image",nullable = false)
     private String albumImage;
@@ -50,5 +52,5 @@ public class Album {
     
     //liên kết 1-n với bảng AlbumSong
     @OneToMany(mappedBy="album", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<AlbumSong> albumSongs=new ArrayList<>();
+    private List<AlbumSong> albumSongs;
 }

@@ -1,12 +1,19 @@
 package com.app.Music_Web.Domain.Entities;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.app.Music_Web.Domain.Enums.AccountType;
+import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
+import com.app.Music_Web.Domain.ValueObjects.User.UserName;
+import com.app.Music_Web.Domain.ValueObjects.User.UserPassword;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,17 +35,18 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(nullable = false,name = "user_name")
-    private String userName;
+    @Embedded
+    private UserName userName;
 
-    @Column(nullable = false,unique = true,name = "email")
-    private String email;
+    @Embedded
+    private UserEmail email;
 
-    @Column(nullable = true,name = "password")
-    private String password;
+    @Embedded
+    private UserPassword password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false,name = "account_type")
-    private String accountType;
+    private AccountType accountType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false,name = "created_date")
@@ -46,49 +54,49 @@ public class User {
 
     //liên kết 1-n với bảng UserPayments
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<UserPayment> userPayments=new ArrayList<>();
+    private List<UserPayment> userPayments;
 
     //liên kết 1-n với bảng UserAuth
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<UserAuth> userAuths=new ArrayList<>();
+    private List<UserAuth> userAuths;
 
     //liên kết 1-n với bảng UserStatus
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<UserStatus> userStatusHistory=new ArrayList<>();
+    private List<UserStatus> userStatusHistory;
 
     //liên kết 1-n với bảng SongUpload
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<SongUpload> songUploads=new ArrayList<>();
+    private List<SongUpload> songUploads;
 
     //liên kết 1-n với bảng SongApproval
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<SongApproval> songApprovals=new ArrayList<>();
+    private List<SongApproval> songApprovals;
 
     //liên kết 1-n với bảng album
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<Album> albums=new ArrayList<>();
+    private List<Album> albums;
 
     //liên kết 1-n với bảng playlist
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<Playlist> playlists=new ArrayList<>();
+    private List<Playlist> playlists;
 
     //liên kết 1-n với bảng likedSong
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<LikedSong> likedSongs=new ArrayList<>();
+    private List<LikedSong> likedSongs;
 
     //liên kết 1-n với bảng listenHistory
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<ListenHistory> listeningHistories=new ArrayList<>();
+    private List<ListenHistory> listeningHistories;
 
     //liên kết 1-n với bảng follow
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<Follow> followerLists=new ArrayList<>();
+    private List<Follow> followerLists;
 
     //liên kết 1-n với bảng follow
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<Follow> followedLists=new ArrayList<>();
+    private List<Follow> followedLists;
 
     //liên kết 1-n với bảng userRole
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<UserRole> userRoles=new ArrayList<>();
+    private List<UserRole> userRoles;
 }

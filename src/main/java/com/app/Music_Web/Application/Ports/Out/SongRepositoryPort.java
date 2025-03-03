@@ -1,9 +1,10 @@
 package com.app.Music_Web.Application.Ports.Out;
 
 import com.app.Music_Web.Domain.Entities.Song;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SongRepositoryPort {
-    // Song save(Song song);          
-    
+    Page<Song> findAll(Pageable pageable); 
+    Song save(Song song);
 }

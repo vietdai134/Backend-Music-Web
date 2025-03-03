@@ -6,6 +6,7 @@ Request (Request DTOs - dữ liệu từ client gửi lên).
 Response (Response DTO - dữ liệu trả về client).
 ApiExceptionHandler.java (Xử lý exception cho API).
 2. Application Layer (Use Cases, DTOs, Services)
+Mapper
 DTO (DTOs để truyền dữ liệu giữa các tầng).
 Ports : 
 - In (Interface của Services - các Use case chung và riêng).

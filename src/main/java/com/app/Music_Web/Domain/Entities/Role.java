@@ -1,6 +1,5 @@
 package com.app.Music_Web.Domain.Entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -37,9 +36,9 @@ public class Role {
     
     //liên kết 1-n với bảng userRole
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<UserRole> userRole= new ArrayList<>();
+    private List<UserRole> userRole;
 
     //liên kết 1-n với bảng rolePermission
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<RolePermission> rolePermissions= new ArrayList<>();
+    private List<RolePermission> rolePermissions;
 }

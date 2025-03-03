@@ -2,8 +2,12 @@ package com.app.Music_Web.Domain.Entities;
 
 import java.util.Date;
 
+import com.app.Music_Web.Domain.Enums.ApprovalStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -29,8 +33,9 @@ public class SongApproval {
     @Column(name = "approval_id")
     private Long approvalId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="approval_status",nullable = false)
-    private String approvalStatus;
+    private ApprovalStatus approvalStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="approved_date",nullable = false)

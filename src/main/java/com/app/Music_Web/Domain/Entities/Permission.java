@@ -1,6 +1,5 @@
 package com.app.Music_Web.Domain.Entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -27,7 +26,7 @@ public class Permission {
     @Column(name = "permission_id")
     private Long permissionId;
 
-    @Column(name="permission_name",nullable = false)
+    @Column(name="permission_name",nullable = false,unique = true)
     private String permissionName;
 
     @Column(name="description",nullable = false)
@@ -35,5 +34,5 @@ public class Permission {
 
     //liên kết 1-n với bảng RolePermission
     @OneToMany(mappedBy = "permission")
-    private List<RolePermission> rolePermissions=new ArrayList<>();
+    private List<RolePermission> rolePermissions;
 }

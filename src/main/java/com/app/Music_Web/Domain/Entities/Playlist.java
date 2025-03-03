@@ -1,6 +1,5 @@
 package com.app.Music_Web.Domain.Entities;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,5 +46,5 @@ public class Playlist {
 
     //liên kết 1-n với bảng playlistSong
     @OneToMany(mappedBy="playlist", cascade = CascadeType.ALL, orphanRemoval = true )
-    private List<PlaylistSong> playlistSongs=new ArrayList<>();
+    private List<PlaylistSong> playlistSongs;
 }

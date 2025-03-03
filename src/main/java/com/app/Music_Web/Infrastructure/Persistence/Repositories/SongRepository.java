@@ -2,11 +2,10 @@ package com.app.Music_Web.Infrastructure.Persistence.Repositories;
 
 import com.app.Music_Web.Application.Ports.Out.SongRepositoryPort;
 import com.app.Music_Web.Domain.Entities.Song;
-
-
-
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+
+@Repository
 public interface SongRepository extends JpaRepository<Song, Long>, SongRepositoryPort {
-
 }

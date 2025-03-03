@@ -1,9 +1,12 @@
 package com.app.Music_Web.Domain.Entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.app.Music_Web.Domain.ValueObjects.Genre.GenreName;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -24,11 +27,13 @@ import jakarta.persistence.GenerationType;
 public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name="genre_id")
+    private Long genreId;
 
-    private String name;
+    @Embedded
+    private GenreName genreName;
 
     //liên kết 1-n với bảng SongGenre
     @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SongGenre> songGenres = new ArrayList<>();
+    private List<SongGenre> songGenres;
 }

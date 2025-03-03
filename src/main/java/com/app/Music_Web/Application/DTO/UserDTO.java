@@ -1,0 +1,20 @@
+package com.app.Music_Web.Application.DTO;
+
+import java.util.Date;
+
+import com.app.Music_Web.Domain.Enums.AccountType;
+
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserDTO {
+    private Long userId;
+    private String userName;
+    private String email;
+    private String password;
+    private AccountType accountType;
+    private Date createdDate;
+}
