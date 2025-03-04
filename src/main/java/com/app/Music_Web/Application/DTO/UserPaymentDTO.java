@@ -10,6 +10,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserPaymentDTO {
     private Long paymentId;
     private String paymentMethod;

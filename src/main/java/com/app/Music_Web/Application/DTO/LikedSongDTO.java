@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LikedSongDTO {
     private Long likeId;
     private Date likedDate;

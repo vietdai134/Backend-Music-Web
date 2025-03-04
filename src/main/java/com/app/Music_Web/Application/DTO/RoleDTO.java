@@ -5,6 +5,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RoleDTO {
     private Long roleId;
     private String roleName;

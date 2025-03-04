@@ -8,6 +8,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PlaylistDTO {
     private Long playlistId;
     private String playlistName;

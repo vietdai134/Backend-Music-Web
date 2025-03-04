@@ -5,6 +5,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PermissionDTO {
     private Long permissionId;
     private String permissionName;

@@ -7,4 +7,8 @@ import org.springframework.data.domain.Pageable;
 public interface SongRepositoryPort {
     Page<Song> findAll(Pageable pageable); 
     Song save(Song song);
+    void delete(Song song);
+    Song findByTitle_Title(String songTitle);
+    Song findByArtist_Artist(String songArtist);
+    Song findBySongId(Long songId);
 }

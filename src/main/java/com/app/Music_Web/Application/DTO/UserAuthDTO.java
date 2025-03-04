@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserAuthDTO {
     private Long authId;
     private String googleId;

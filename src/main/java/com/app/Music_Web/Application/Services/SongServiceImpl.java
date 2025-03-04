@@ -7,7 +7,8 @@ import com.app.Music_Web.Domain.ValueObjects.Song.SongArtist;
 import com.app.Music_Web.Domain.ValueObjects.Song.SongTitle;
 import com.app.Music_Web.Application.DTO.SongDTO;
 import com.app.Music_Web.Application.Mapper.SongMapper;
-import com.app.Music_Web.Application.Ports.In.Song.FindAllSongService;
+import com.app.Music_Web.Application.Ports.In.Song.DeleteSongService;
+import com.app.Music_Web.Application.Ports.In.Song.FindSongService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 
 
 @Service
-public class SongServiceImpl implements SaveSongService, FindAllSongService {
+public class SongServiceImpl implements SaveSongService, FindSongService,DeleteSongService {
     private final SongRepositoryPort songRepositoryPort;
     public SongServiceImpl(SongRepositoryPort songRepositoryPort) {
         this.songRepositoryPort = songRepositoryPort;
@@ -38,6 +39,33 @@ public class SongServiceImpl implements SaveSongService, FindAllSongService {
                         .build();
         Song saveSong = songRepositoryPort.save(song);
         return SongMapper.toDTO(saveSong);
+    }
+
+    @Override
+    public void deleteSong(Long songId) {
+        Song song = songRepositoryPort.findBySongId(songId);
+        if(song==null){
+            throw new RuntimeException("song not found");
+        }
+        songRepositoryPort.delete(song);
+    }
+
+    @Override
+    public SongDTO findBySongTitle(String songTitle) {
+        Song song=songRepositoryPort.findByTitle_Title(songTitle);
+        if(song==null){
+            throw new RuntimeException("Song not found");
+        }
+        return SongMapper.toDTO(song);
+    }
+
+    @Override
+    public SongDTO findBySongArtist(String songArtist) {
+        Song song=songRepositoryPort.findByArtist_Artist(songArtist);
+        if(song==null){
+            throw new RuntimeException("Song not found");
+        }
+        return SongMapper.toDTO(song);
     }
  
 }

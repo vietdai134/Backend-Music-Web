@@ -19,6 +19,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "user_auth")
 public class UserAuth {
     @Id

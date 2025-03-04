@@ -24,6 +24,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "user_payment")
 public class UserPayment {
     @Id

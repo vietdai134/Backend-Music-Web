@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ListenHistoryDTO {
     private Long historyId;
     private Date listenedDate;

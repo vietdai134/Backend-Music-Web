@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SongUploadDTO {
     private Long uploadId;
     private Date uploadDate;

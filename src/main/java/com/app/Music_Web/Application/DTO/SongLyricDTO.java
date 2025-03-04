@@ -5,6 +5,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SongLyricDTO {
     private Long lyricsId;
     private String lyric;

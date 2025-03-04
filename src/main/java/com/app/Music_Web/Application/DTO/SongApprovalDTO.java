@@ -10,6 +10,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SongApprovalDTO {
     private Long approvalId;
     private ApprovalStatus approvalStatus;
