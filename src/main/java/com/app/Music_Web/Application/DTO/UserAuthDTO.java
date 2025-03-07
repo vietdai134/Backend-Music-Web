@@ -12,6 +12,7 @@ public class UserAuthDTO {
     private Long authId;
     private String googleId;
     private String facebookId;
+    private String accessToken;
     private String refreshToken;
     private Date refreshTokenExpiry;
     private String userName;

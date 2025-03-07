@@ -1,9 +1,7 @@
 package com.app.Music_Web.API.Controllers;
 
 import com.app.Music_Web.API.Request.SongRequest;
-import com.app.Music_Web.API.Response.GenreResponse;
 import com.app.Music_Web.API.Response.SongResponse;
-import com.app.Music_Web.Application.DTO.GenreDTO;
 import com.app.Music_Web.Application.DTO.SongDTO;
 import com.app.Music_Web.Application.Ports.In.Song.DeleteSongService;
 import com.app.Music_Web.Application.Ports.In.Song.FindSongService;
