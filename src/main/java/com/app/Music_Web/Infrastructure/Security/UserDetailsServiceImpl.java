@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-// Xóa import không cần thiết
-// import org.springframework.security.core.userdetails.User as SpringUser;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -27,7 +25,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
 
-        // Sử dụng tên đầy đủ để tránh xung đột
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail().getEmail())
                 .password(user.getPassword().getPassword())
