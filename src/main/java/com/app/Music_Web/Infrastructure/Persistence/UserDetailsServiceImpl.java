@@ -1,4 +1,4 @@
-package com.app.Music_Web.Infrastructure.Security;
+package com.app.Music_Web.Infrastructure.Persistence;
 
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
 import com.app.Music_Web.Domain.Entities.User;

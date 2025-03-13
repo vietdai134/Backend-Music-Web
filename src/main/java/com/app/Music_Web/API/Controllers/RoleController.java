@@ -9,11 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.Music_Web.API.Request.RoleRequest;
-import com.app.Music_Web.API.Request.SongRequest;
 import com.app.Music_Web.API.Response.RoleResponse;
-import com.app.Music_Web.API.Response.SongResponse;
 import com.app.Music_Web.Application.DTO.RoleDTO;
-import com.app.Music_Web.Application.DTO.SongDTO;
 import com.app.Music_Web.Application.Ports.In.Role.FindRoleService;
 import com.app.Music_Web.Application.Ports.In.Role.SaveRoleService;
 
@@ -41,7 +38,7 @@ public class RoleController {
     }
 
     @PostMapping
-    public RoleResponse createSong(@RequestBody RoleRequest request) {
+    public RoleResponse createRole(@RequestBody RoleRequest request) {
         RoleDTO savedRole = saveRoleService.saveRole(request.getRoleName(), 
                             request.getDescription());
         return RoleResponse.builder()

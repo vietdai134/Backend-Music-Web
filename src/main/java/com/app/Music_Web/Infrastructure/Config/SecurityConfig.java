@@ -33,20 +33,6 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //     http
-    //         .csrf(csrf -> csrf.disable())
-    //         .authorizeHttpRequests(auth -> auth
-    //             .requestMatchers("/api/songs/all","/api/auth/login", "/api/user","/swagger-ui/**", "/v3/api-docs/**").permitAll()
-    //             .anyRequest().authenticated()
-    //         )
-    //         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    //         .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-    //     return http.build();
-    // }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -62,7 +48,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-     @Bean
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Cho phép Angular
