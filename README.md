@@ -25,4 +25,18 @@ Config
 - JpaConfig.java (cấu hình JPA, Hibernate)
 - ApplicationStartup.java (Cấu hình khi ứng dụng khởi động)
 
-Swagger: http://localhost:8080/swagger-ui/index.html
+Swagger: 
+<!-- http://localhost:8080/swagger-ui/index.html -->
+https://localhost:8443/swagger-ui/index.html
+
+Tạo ssl:
+1. Tạo folder ssl trong resources
+2. Vào thư mục ssl 
+tạo chứng chỉ ký tự:
+openssl req -x509 -newkey rsa:2048 -keyout private.key -out certificate.crt -days 365 -nodes
+Nên đặt common name là localhost hoặc tên của domain.
+Chuyển chứng chỉ sang keystore .p12:
+openssl pkcs12 -export -in certificate.crt -inkey private.key -out keystore.p12 -name mycert -password pass:mypassword
+3. cấu hình trong application.properties:
+server.ssl.key-store-password=mypassword
+server.ssl.key-alias=mycert

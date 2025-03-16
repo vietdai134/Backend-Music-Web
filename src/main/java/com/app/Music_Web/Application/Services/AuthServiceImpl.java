@@ -28,6 +28,32 @@ public class AuthServiceImpl implements AuthService {
         this.jwtUtil=jwtUtil;
     }
     
+    // @Override
+    // public UserAuthDTO login(String email, String password) {
+    //     UserEmail userEmail = new UserEmail(email);
+    //     User user = userRepositoryPort.findByEmail(userEmail);
+    //     if (user == null || !passwordEncoder.matches(password, user.getPassword().getPassword())) {
+    //         throw new RuntimeException("Invalid email or password");
+    //     }
+
+    //     String accessToken = jwtUtil.generateToken(email);
+
+    //     UserAuth userAuth = user.getUserAuths().stream()
+    //             .findFirst()
+    //             .orElse(UserAuth.builder()
+    //                     .user(user)
+    //                     .refreshToken(UUID.randomUUID().toString())
+    //                     .refreshTokenExpiry(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 ngày
+    //                     .build());
+
+    //     if (!user.getUserAuths().contains(userAuth)) {
+    //         user.getUserAuths().add(userAuth);
+    //     }
+    //     userRepositoryPort.save(user);
+
+    //     return UserAuthMapper.toDTO(userAuth, accessToken);
+    // }
+
     @Override
     public UserAuthDTO login(String email, String password) {
         UserEmail userEmail = new UserEmail(email);
@@ -40,16 +66,23 @@ public class AuthServiceImpl implements AuthService {
 
         UserAuth userAuth = user.getUserAuths().stream()
                 .findFirst()
-                .orElse(UserAuth.builder()
-                        .user(user)
-                        .refreshToken(UUID.randomUUID().toString())
-                        .refreshTokenExpiry(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 ngày
-                        .build());
+                .orElse(null); // Lấy UserAuth đầu tiên hoặc null nếu không có
 
-        if (!user.getUserAuths().contains(userAuth)) {
-            user.getUserAuths().add(userAuth);
+        // Kiểm tra xem UserAuth có tồn tại và refreshToken có hết hạn không
+        if (userAuth == null || userAuth.getRefreshTokenExpiry().before(new Date())) {
+            // Nếu không có UserAuth hoặc refreshToken đã hết hạn, tạo mới
+            userAuth = UserAuth.builder()
+                    .user(user)
+                    .refreshToken(UUID.randomUUID().toString())
+                    .refreshTokenExpiry(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 ngày
+                    .build();
+            if (!user.getUserAuths().contains(userAuth)) {
+                user.getUserAuths().clear(); // Xóa UserAuth cũ nếu có
+                user.getUserAuths().add(userAuth); // Thêm UserAuth mới
+            }
         }
-        userRepositoryPort.save(user);
+
+        userRepositoryPort.save(user); // Lưu vào database
 
         return UserAuthMapper.toDTO(userAuth, accessToken);
     }

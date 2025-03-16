@@ -1,6 +1,4 @@
-package com.app.Music_Web.Application.DTO;
-
-import java.util.Date;
+package com.app.Music_Web.API.Response;
 import lombok.*;
 
 @Getter
@@ -8,9 +6,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AlbumDTO {
+public class AlbumResponse {
     private Long albumId;
     private String albumName;
     private String albumImage;
-    private Date createdDate;
 }

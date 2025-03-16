@@ -5,4 +5,5 @@ import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 
 public interface FindUserService {
     UserDTO findUserEmail (UserEmail userEmail);
+    UserDTO findUserById (Long userId);
 }

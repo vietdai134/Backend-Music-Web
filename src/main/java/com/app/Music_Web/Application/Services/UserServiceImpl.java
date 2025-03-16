@@ -49,5 +49,12 @@ public class UserServiceImpl implements RegisterService, FindUserService {
         }
         return UserMapper.toDTO(user);
     }
+
+    @Override
+    public UserDTO findUserById(Long userId) {
+        User user = userRepositoryPort.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+        return UserMapper.toDTO(user);
+    }
     
 }
