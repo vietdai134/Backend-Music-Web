@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import com.app.Music_Web.Domain.Entities.Permission;
 import com.app.Music_Web.Infrastructure.Persistence.Repositories.PermissionRepository;
@@ -12,6 +13,7 @@ import com.app.Music_Web.Infrastructure.Persistence.Repositories.PermissionRepos
 @Configuration
 public class PermissionSeeder {
     @Bean
+    @Order(3)
     CommandLineRunner seedPermissions (PermissionRepository permisionRepository){
         return args -> {
             if(permisionRepository.count()==0){
@@ -19,17 +21,41 @@ public class PermissionSeeder {
 
                 List<Permission> Permissions = List.of(
                     Permission.builder()
-                        .permissionName("Nghe")
-                        .description("")
+                        .permissionName("CREATE_PLAYLIST")
+                        .description("Tạo danh sách phát")
                         .build(),
                     Permission.builder()
-                        .permissionName("Tải")
-                        .description("")
+                        .permissionName("HISTORY")
+                        .description("Lịch sử nghe nhạc")
                         .build(),
                     Permission.builder()
-                        .permissionName("Upload")
-                        .description("")
-                        .build()      
+                        .permissionName("DOWNLOAD_SONG")
+                        .description("Tải nhạc")
+                        .build(),
+                    Permission.builder()
+                        .permissionName("LIKE_SONG")
+                        .description("Thích bài hát")
+                        .build(),
+                        Permission.builder()
+                        .permissionName("UPLOAD_SONG")
+                        .description("Đăng tải bài hát")
+                        .build(),
+                    Permission.builder()
+                        .permissionName("EDIT_SONG")
+                        .description("Chỉnh sửa thông tin bài hát đã đăng tải")
+                        .build(),
+                    Permission.builder()
+                        .permissionName("CREATE_ALBUM")
+                        .description("Tạo album")
+                        .build(),
+                    Permission.builder()
+                        .permissionName("MODERATE_SONG")
+                        .description("Kiểm duyệt bài hát ở trang admin")
+                        .build(),
+                    Permission.builder()
+                        .permissionName("SYSTEM_MANAGEMENT")
+                        .description("Quản lý hệ thống ở trang admin")
+                        .build()   
                 );
 
                 permisionRepository.saveAll(Permissions);

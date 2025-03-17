@@ -2,6 +2,7 @@ package com.app.Music_Web.Infrastructure.Security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,36 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader("Authorization");
-
         String email = null;
         String jwt = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            email = jwtUtil.extractEmail(jwt);
+        // Đọc token từ cookie
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    System.out.println("JWT from cookie: " + jwt); // Debug
+                    break;
+                }
+            }
+        }
+
+        // Nếu không có trong cookie, thử đọc từ header Authorization (tùy chọn)
+        if (jwt == null) {
+            final String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                jwt = authorizationHeader.substring(7);
+                System.out.println("JWT from header: " + jwt); // Debug
+            }
+        }
+
+        if (jwt != null) {
+            try {
+                email = jwtUtil.extractEmail(jwt);
+            } catch (Exception e) {
+                System.out.println("Invalid JWT token: " + e.getMessage());
+            }
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -44,8 +67,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("Authentication set for user: " + email + " with authorities: " + userDetails.getAuthorities());
+            } else {
+                System.out.println("JWT validation failed for token: " + jwt);
             }
         }
+
         chain.doFilter(request, response);
     }
 }

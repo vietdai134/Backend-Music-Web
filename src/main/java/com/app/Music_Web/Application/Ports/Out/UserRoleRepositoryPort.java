@@ -8,4 +8,5 @@ import com.app.Music_Web.Domain.Entities.UserRole;
 public interface UserRoleRepositoryPort {
     UserRole save(UserRole userRole);
     List<UserRole> findByUser(User user);
+    
 }
