@@ -6,5 +6,6 @@ import com.app.Music_Web.Application.DTO.RoleDTO;
 
 public interface FindRoleService {
     List<RoleDTO> findAll();
-    
+    // List<RoleDTO> findRolesByUserId(Long userId);
+    RoleDTO findByRoleName(String roleName);
 } 

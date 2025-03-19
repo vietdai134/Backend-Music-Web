@@ -7,4 +7,6 @@ import com.app.Music_Web.Domain.Entities.Role;
 public interface RoleRepositoryPort {
     Role save(Role role);
     List<Role> findAll();
+    // List<Role> findRolesByUserId(Long userId);
+    Role findByRoleName(String roleName);
 }

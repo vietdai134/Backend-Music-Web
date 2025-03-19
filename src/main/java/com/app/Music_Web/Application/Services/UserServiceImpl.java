@@ -2,29 +2,37 @@ package com.app.Music_Web.Application.Services;
 
 import java.util.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.Music_Web.Application.DTO.UserDTO;
 import com.app.Music_Web.Application.Mapper.UserMapper;
+import com.app.Music_Web.Application.Ports.In.User.DeleteUserService;
 import com.app.Music_Web.Application.Ports.In.User.FindUserService;
 import com.app.Music_Web.Application.Ports.In.User.RegisterService;
+import com.app.Music_Web.Application.Ports.Out.RoleRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
+import com.app.Music_Web.Domain.Entities.Role;
 import com.app.Music_Web.Domain.Entities.User;
+import com.app.Music_Web.Domain.Entities.UserRole;
 import com.app.Music_Web.Domain.Enums.AccountType;
 import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 import com.app.Music_Web.Domain.ValueObjects.User.UserName;
 import com.app.Music_Web.Domain.ValueObjects.User.UserPassword;
 
 @Service
-public class UserServiceImpl implements RegisterService, FindUserService {
+public class UserServiceImpl implements RegisterService, FindUserService,DeleteUserService {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl (UserRepositoryPort userRepositoryPort){
+    private final RoleRepositoryPort roleRepositoryPort;
+    public UserServiceImpl (UserRepositoryPort userRepositoryPort, RoleRepositoryPort roleRepositoryPort){
         this.userRepositoryPort=userRepositoryPort;
+        this.roleRepositoryPort = roleRepositoryPort;
         this.passwordEncoder = new BCryptPasswordEncoder();
+
     }
 
     @Override
@@ -36,7 +44,17 @@ public class UserServiceImpl implements RegisterService, FindUserService {
                         .password(new UserPassword(hashedPassword))
                         .accountType(AccountType.NORMAL)
                         .createdDate(new Date())
+                        .userRoles(new ArrayList<>())
                         .build();
+                        
+        Role defaultRole = roleRepositoryPort.findByRoleName("USER");
+        UserRole userRole= UserRole.builder()
+                        .user(user)
+                        .role(defaultRole)
+                        .grantedDate(new Date())
+                        .build();
+                        user.getUserRoles().add(userRole);
+
         User userRegister= userRepositoryPort.save(user);
         return UserMapper.toDTO(userRegister);
     }
@@ -55,6 +73,26 @@ public class UserServiceImpl implements RegisterService, FindUserService {
         User user = userRepositoryPort.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
         return UserMapper.toDTO(user);
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        User user = userRepositoryPort.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+        userRepositoryPort.delete(user);
+    }
+
+    @Override
+    public Page<UserDTO> findAllWithRoles(Pageable pageable) {
+        Page<User> users = userRepositoryPort.findAllWithRoles(pageable);
+        return users.map(UserMapper::toDTO);
+    }
+
+    // Thêm phương thức tìm kiếm gần đúng với phân trang
+    @Override
+    public Page<UserDTO> searchByUserNameOrEmail(String keyword, Pageable pageable) {
+        Page<User> users = userRepositoryPort.searchByUserNameOrEmail(keyword, pageable);
+        return users.map(UserMapper::toDTO);
     }
     
 }

@@ -17,6 +17,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -29,7 +30,11 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "user")
+@Table(name = "user",
+    indexes = {
+    @Index(name = "idx_username", columnList = "user_name"), // Index cho userName
+    @Index(name = "idx_email", columnList = "email")        // Index cho email
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
