@@ -18,8 +18,9 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    @Value("${jwt.expiration}")
-    private Long JWT_EXPIRATION;
+    // @Value("${jwt.expiration}")
+    // private Long JWT_EXPIRATION;
+    private final Long JWT_EXPIRATION = 15 * 60 * 1000L; // 15 phút
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);

@@ -4,4 +4,5 @@ import com.app.Music_Web.Application.DTO.UserAuthDTO;
 
 public interface AuthService {
     UserAuthDTO login (String email, String password);
+    UserAuthDTO refreshAccessToken(String refreshToken);
 }

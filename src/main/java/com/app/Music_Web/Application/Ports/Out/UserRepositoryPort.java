@@ -9,4 +9,5 @@ public interface UserRepositoryPort {
     User save(User user);
     User findByEmail(UserEmail email);
     Optional<User> findById(Long userId);
+    User findByUserAuths_RefreshToken(String refreshToken);
 } 

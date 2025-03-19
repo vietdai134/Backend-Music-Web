@@ -54,15 +54,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             .distinct() // Loại bỏ trùng lặp nếu user có nhiều role với permission chung
             .collect(Collectors.toList());
         System.out.println("Permissions for user " + email + ": " + authorities);
-        // return org.springframework.security.core.userdetails.User.builder()
-        //         .username(user.getEmail().getEmail())
-        //         .password(user.getPassword().getPassword())
-        //         .roles(user.getAccountType().name())
-        //         .build();
-        return new org.springframework.security.core.userdetails.User(
-            user.getUserName().getUserName(), // Lấy từ UserName value object
-            user.getPassword().getPassword(), // Lấy từ UserPassword value object
-            authorities
-        );
+        // return new org.springframework.security.core.userdetails.User(
+        //     user.getUserName().getUserName(), // Lấy từ UserName value object
+        //     user.getPassword().getPassword(), // Lấy từ UserPassword value object
+        //     authorities
+        // );
+
+        return new CustomUserDetails(
+                        user.getUserId(),                  // Assuming User has getUserId()
+                        user.getUserName().getUserName(),  // userName from value object
+                        user.getEmail().getEmail(),        // email
+                        user.getPassword().getPassword(),  // password
+                        authorities                        // authorities
+    );
     }
 }
