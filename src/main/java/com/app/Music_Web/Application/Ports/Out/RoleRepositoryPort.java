@@ -9,4 +9,6 @@ public interface RoleRepositoryPort {
     List<Role> findAll();
     // List<Role> findRolesByUserId(Long userId);
     Role findByRoleName(String roleName);
+    List<Role> findByRoleNameIn(List<String> roleNames);
+
 }

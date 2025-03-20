@@ -40,7 +40,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/songs/all", "/api/auth/**", "/api/user/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/songs/roles","/api/songs/all", "/api/auth/**", "/api/user/**", 
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/api/albums/**").hasAuthority("SYSTEM_MANAGEMENT")
                 .anyRequest().authenticated()
             )

@@ -15,17 +15,21 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.Music_Web.API.Request.RegisterRequest;
 import com.app.Music_Web.API.Request.UserRequest;
+import com.app.Music_Web.API.Request.UserRequest.UserUpdateRequest;
 import com.app.Music_Web.API.Response.UserResponse;
 import com.app.Music_Web.Application.DTO.UserDTO;
 import com.app.Music_Web.Application.Ports.In.User.DeleteUserService;
 import com.app.Music_Web.Application.Ports.In.User.FindUserService;
 import com.app.Music_Web.Application.Ports.In.User.RegisterService;
+import com.app.Music_Web.Application.Ports.In.User.UpdateUserService;
 import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
 
@@ -35,20 +39,31 @@ public class UserController {
     private final RegisterService registerService;
     private final FindUserService findUserService;
     private final DeleteUserService deleteUserService;
+    private final UpdateUserService updateUserService;
 
     public UserController(
                     RegisterService registerService, 
                     FindUserService findUserService, 
-                    DeleteUserService deleteUserService) {
+                    DeleteUserService deleteUserService,
+                    UpdateUserService updateUserService) {
         this.registerService=registerService;
         this.findUserService=findUserService;
         this.deleteUserService=deleteUserService;
+        this.updateUserService=updateUserService;
     }
 
-    @PostMapping
-    public ResponseEntity<Void> userRegister(@RequestBody UserRequest request) {
+    @PostMapping("/register")
+    public ResponseEntity<Void> userRegister(@RequestBody RegisterRequest request) {
         registerService.userRegister(request.getUserName(), 
                             request.getEmail(), request.getPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Void> userCreate(@RequestBody UserRequest request) {
+        registerService.userCreate(request.getUserName(), 
+                            request.getEmail(), request.getPassword(),
+                            request.getAccountType(),request.getRoleNames());
         return ResponseEntity.ok().build();
     }
 
@@ -98,7 +113,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // Thêm endpoint tìm kiếm gần đúng với phân trang
+    //tìm kiếm gần đúng với phân trang
     @GetMapping("/search")
     public ResponseEntity<Page<UserResponse>> searchUsersFuzzy(
             @RequestParam String keyword,
@@ -117,4 +132,30 @@ public class UserController {
         return ResponseEntity.ok(userResponses);
     }
 
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId){
+        UserDTO user= findUserService.findUserById(userId);
+        UserResponse userResponse= UserResponse.builder()
+                                    .userId(userId)
+                                    .userName(user.getUserName())
+                                    .email(user.getEmail())
+                                    .accountType(user.getAccountType().toString())
+                                    .roles(user.getRoles())
+                                    .build();
+        return ResponseEntity.ok(userResponse);
+    }
+
+    @PutMapping("/update/{userId}")
+    public ResponseEntity<Void> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UserUpdateRequest request) {
+        updateUserService.updateUser(
+                userId,
+                request.getUserName(),
+                request.getEmail(),
+                request.getAccountType(),
+                request.getRoleNames());
+        return ResponseEntity.ok().build();
+    }
 }

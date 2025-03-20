@@ -1,6 +1,7 @@
 package com.app.Music_Web.Application.Services;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import com.app.Music_Web.Application.Mapper.UserMapper;
 import com.app.Music_Web.Application.Ports.In.User.DeleteUserService;
 import com.app.Music_Web.Application.Ports.In.User.FindUserService;
 import com.app.Music_Web.Application.Ports.In.User.RegisterService;
+import com.app.Music_Web.Application.Ports.In.User.UpdateUserService;
 import com.app.Music_Web.Application.Ports.Out.RoleRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
 import com.app.Music_Web.Domain.Entities.Role;
@@ -24,7 +26,7 @@ import com.app.Music_Web.Domain.ValueObjects.User.UserName;
 import com.app.Music_Web.Domain.ValueObjects.User.UserPassword;
 
 @Service
-public class UserServiceImpl implements RegisterService, FindUserService,DeleteUserService {
+public class UserServiceImpl implements RegisterService, FindUserService,DeleteUserService, UpdateUserService {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepositoryPort roleRepositoryPort;
@@ -54,6 +56,36 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
                         .grantedDate(new Date())
                         .build();
                         user.getUserRoles().add(userRole);
+
+        User userRegister= userRepositoryPort.save(user);
+        return UserMapper.toDTO(userRegister);
+    }
+
+    @Override
+    public UserDTO userCreate(String userName, String email, String password,String accountType,List<String> roleNames) {
+        String hashedPassword= passwordEncoder.encode(password);
+        User user = User.builder()
+                        .userName(new UserName(userName))
+                        .email(new UserEmail(email))
+                        .password(new UserPassword(hashedPassword))
+                        // .accountType(AccountType.NORMAL)
+                        .accountType(AccountType.valueOf(accountType.toUpperCase()))
+                        .createdDate(new Date())
+                        .userRoles(new ArrayList<>())
+                        .build();
+        
+        // Lấy danh sách các vai trò từ repository dựa trên danh sách tên vai trò
+        List<Role> roles = roleRepositoryPort.findByRoleNameIn(roleNames);
+         // Tạo danh sách UserRole
+        List<UserRole> userRoles = roles.stream()
+            .map(role -> UserRole.builder()
+                .user(user)
+                .role(role)
+                .grantedDate(new Date())
+                .build())
+            .collect(Collectors.toList());
+
+        user.getUserRoles().addAll(userRoles); 
 
         User userRegister= userRepositoryPort.save(user);
         return UserMapper.toDTO(userRegister);
@@ -95,4 +127,38 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
         return users.map(UserMapper::toDTO);
     }
     
+    @Override
+    public UserDTO updateUser(Long userId, String userName, String email, String accountType, List<String> roleNames) {
+        // Tìm user theo userId
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
+
+        // Cập nhật các thuộc tính
+        user.setUserName(new UserName(userName));
+        user.setEmail(new UserEmail(email));
+        user.setAccountType(AccountType.valueOf(accountType.toUpperCase()));
+
+        // Xóa các UserRole cũ
+        user.getUserRoles().clear();
+
+        // Lấy danh sách các vai trò mới từ repository dựa trên roleNames
+        List<Role> roles = roleRepositoryPort.findByRoleNameIn(roleNames);
+        
+        // Tạo danh sách UserRole mới
+        List<UserRole> userRoles = roles.stream()
+            .map(role -> UserRole.builder()
+                .user(user)
+                .role(role)
+                .grantedDate(new Date()) // Giữ ngày cấp mới hoặc dùng lại ngày cũ nếu cần
+                .build())
+            .collect(Collectors.toList());
+
+        // Thêm UserRole mới vào user
+        user.getUserRoles().addAll(userRoles);
+
+        // Lưu user đã cập nhật
+        User updatedUser = userRepositoryPort.save(user);
+        return UserMapper.toDTO(updatedUser);
+    }
+
 }

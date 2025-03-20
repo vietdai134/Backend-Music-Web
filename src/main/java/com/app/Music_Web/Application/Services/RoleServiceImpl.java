@@ -45,6 +45,18 @@ public class RoleServiceImpl implements SaveRoleService, FindRoleService {
         return RoleMapper.toDTO(role);
     }
 
+    @Override
+    public List<RoleDTO> findByRoleNameIn(List<String> roleName) {
+        List<Role> role = roleRepositoryPort.findByRoleNameIn(roleName);
+        if(role == null){
+            throw new RuntimeException("Role not found");
+        }
+        // return RoleMapper.toDTO(role);
+        return role.stream()
+                    .map(RoleMapper::toDTO)
+                    .toList();
+    }
+    
 
     
 }
