@@ -1,6 +1,10 @@
 package com.app.Music_Web.Infrastructure.Persistence.Repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.app.Music_Web.Application.Ports.Out.GenreRepositoryPort;
@@ -8,5 +12,8 @@ import com.app.Music_Web.Domain.Entities.Genre;
 
 @Repository
 public interface GenreRepository extends JpaRepository<Genre,Long>,GenreRepositoryPort{
-
+    @Override
+    @Query("SELECT g FROM Genre g " +
+           "WHERE LOWER(g.genreName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Genre> searchByGenreName(@Param("keyword") String keyword,Pageable pageable);
 }

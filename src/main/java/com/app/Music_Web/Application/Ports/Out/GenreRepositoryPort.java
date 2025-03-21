@@ -7,8 +7,11 @@ import com.app.Music_Web.Domain.Entities.Genre;
 
 public interface GenreRepositoryPort {
     Page<Genre> findAll(Pageable pageable);
+    Page<Genre> searchByGenreName(String keyword,Pageable pageable);
+
     Genre save (Genre genre);
     void delete(Genre genre);
-    Genre findByGenreName_GenreName(String genreName);
+    
+    // Genre findByGenreName_GenreName(String genreName);
     Genre findByGenreId(Long genreId);
 } 

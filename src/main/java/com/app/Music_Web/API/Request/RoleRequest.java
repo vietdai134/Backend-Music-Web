@@ -1,5 +1,7 @@
 package com.app.Music_Web.API.Request;
 
+import java.util.List;
+
 import lombok.*;
 
 @Getter
@@ -9,4 +11,5 @@ import lombok.*;
 public class RoleRequest {
     private String roleName;
     private String description;
+    private List<String> permissionNames;
 }
