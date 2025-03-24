@@ -54,6 +54,9 @@ public class User {
     @Column(nullable = false,name = "account_type")
     private AccountType accountType;
 
+    @Column(name = "user_avatar",nullable = true)
+    private String userAvatar;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false,name = "created_date")
     private Date createdDate;

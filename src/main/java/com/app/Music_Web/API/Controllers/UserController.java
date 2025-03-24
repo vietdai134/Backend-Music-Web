@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.Music_Web.API.Request.RegisterRequest;
 import com.app.Music_Web.API.Request.UserRequest;
-import com.app.Music_Web.API.Request.UserRequest.UserUpdateRequest;
 import com.app.Music_Web.API.Response.UserResponse;
 import com.app.Music_Web.Application.DTO.UserDTO;
 import com.app.Music_Web.Application.Ports.In.User.DeleteUserService;
@@ -32,6 +32,7 @@ import com.app.Music_Web.Application.Ports.In.User.RegisterService;
 import com.app.Music_Web.Application.Ports.In.User.UpdateUserService;
 import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/user")
@@ -59,11 +60,17 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Void> userCreate(@RequestBody UserRequest request) {
+    @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> userCreate(@ModelAttribute UserRequest request) throws Exception{
+        System.out.println("Received: userName=" + request.getUserName() + 
+                      ", avatar=" + (request.getAvatar() != null ? request.getAvatar().getOriginalFilename() : "null") +
+                      ", roleNames=" + request.getRoleNames());
         registerService.userCreate(request.getUserName(), 
-                            request.getEmail(), request.getPassword(),
-                            request.getAccountType(),request.getRoleNames());
+                            request.getEmail(), 
+                            request.getPassword(),
+                            request.getAccountType(),
+                            request.getRoleNames(),
+                            request.getAvatar());
         return ResponseEntity.ok().build();
     }
 
@@ -103,12 +110,13 @@ public class UserController {
                                             .createdDate(user.getCreatedDate())
                                             .roles(user.getRoles())
                                             .email(user.getEmail())
+                                            .avatar(user.getUserAvatar())
                                             .build());
         return ResponseEntity.ok(userResponses);
     }
 
     @DeleteMapping("delete/{userId}")
-    public ResponseEntity<Void> deleteGenre(@PathVariable Long userId){
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) throws Exception{
         deleteUserService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
@@ -128,6 +136,7 @@ public class UserController {
                 .createdDate(user.getCreatedDate())
                 .roles(user.getRoles())
                 .email(user.getEmail())
+                .avatar(user.getUserAvatar())
                 .build());
         return ResponseEntity.ok(userResponses);
     }
@@ -142,20 +151,25 @@ public class UserController {
                                     .email(user.getEmail())
                                     .accountType(user.getAccountType().toString())
                                     .roles(user.getRoles())
+                                    .avatar(user.getUserAvatar())
                                     .build();
         return ResponseEntity.ok(userResponse);
     }
 
-    @PutMapping("/update/{userId}")
+    @PutMapping(value = "/update/{userId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateUser(
             @PathVariable Long userId,
-            @RequestBody UserUpdateRequest request) {
+            // @RequestBody UserUpdateRequest request) throws Exception{
+            @ModelAttribute UserRequest.UserUpdateRequest request) throws Exception {
+        System.out.println("Updating userId=" + userId + ", avatar=" + 
+        (request.getAvatar() != null ? request.getAvatar().getOriginalFilename() : "null"));
         updateUserService.updateUser(
                 userId,
                 request.getUserName(),
                 request.getEmail(),
                 request.getAccountType(),
-                request.getRoleNames());
+                request.getRoleNames(),
+                request.getAvatar());
         return ResponseEntity.ok().build();
     }
 }

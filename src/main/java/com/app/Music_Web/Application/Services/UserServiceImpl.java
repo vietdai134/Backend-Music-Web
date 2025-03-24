@@ -1,6 +1,8 @@
 package com.app.Music_Web.Application.Services;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -8,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.app.Music_Web.Application.DTO.UserDTO;
 import com.app.Music_Web.Application.Mapper.UserMapper;
+import com.app.Music_Web.Application.Ports.In.Cloudinary.CloudinaryService;
 import com.app.Music_Web.Application.Ports.In.User.DeleteUserService;
 import com.app.Music_Web.Application.Ports.In.User.FindUserService;
 import com.app.Music_Web.Application.Ports.In.User.RegisterService;
@@ -26,15 +30,19 @@ import com.app.Music_Web.Domain.ValueObjects.User.UserName;
 import com.app.Music_Web.Domain.ValueObjects.User.UserPassword;
 
 @Service
-public class UserServiceImpl implements RegisterService, FindUserService,DeleteUserService, UpdateUserService {
+public class UserServiceImpl implements RegisterService, FindUserService,
+                                    DeleteUserService, UpdateUserService {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepositoryPort roleRepositoryPort;
-    public UserServiceImpl (UserRepositoryPort userRepositoryPort, RoleRepositoryPort roleRepositoryPort){
+    private final CloudinaryService cloudinaryService;
+    public UserServiceImpl (UserRepositoryPort userRepositoryPort, 
+                            RoleRepositoryPort roleRepositoryPort,
+                            CloudinaryService cloudinaryService){
         this.userRepositoryPort=userRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
         this.passwordEncoder = new BCryptPasswordEncoder();
-
+        this.cloudinaryService= cloudinaryService;
     }
 
     @Override
@@ -47,6 +55,7 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
                         .accountType(AccountType.NORMAL)
                         .createdDate(new Date())
                         .userRoles(new ArrayList<>())
+                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg")
                         .build();
                         
         Role defaultRole = roleRepositoryPort.findByRoleName("USER");
@@ -55,14 +64,18 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
                         .role(defaultRole)
                         .grantedDate(new Date())
                         .build();
-                        user.getUserRoles().add(userRole);
+        user.getUserRoles().add(userRole);
 
         User userRegister= userRepositoryPort.save(user);
         return UserMapper.toDTO(userRegister);
     }
 
     @Override
-    public UserDTO userCreate(String userName, String email, String password,String accountType,List<String> roleNames) {
+    public UserDTO userCreate(String userName, String email, String password,
+                                String accountType,List<String> roleNames,
+                                MultipartFile userAvatar) throws Exception {
+        System.out.println("Creating user: userName=" + userName + 
+                            ", roleNames=" + roleNames);
         String hashedPassword= passwordEncoder.encode(password);
         User user = User.builder()
                         .userName(new UserName(userName))
@@ -73,19 +86,39 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
                         .createdDate(new Date())
                         .userRoles(new ArrayList<>())
                         .build();
-        
+
+        // Tạo CompletableFuture cho việc upload ảnh
+        CompletableFuture<String> avatarFuture = (userAvatar != null && !userAvatar.isEmpty())
+        ? CompletableFuture.supplyAsync(() -> {
+            try {
+                String folder = "users/userAvatars/" + userName;
+                return cloudinaryService.uploadAvatar(userAvatar, folder);
+            } catch (IOException e) {
+                throw new RuntimeException("Upload failed", e);
+            }
+        })
+        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
+
         // Lấy danh sách các vai trò từ repository dựa trên danh sách tên vai trò
         List<Role> roles = roleRepositoryPort.findByRoleNameIn(roleNames);
-         // Tạo danh sách UserRole
+        System.out.println("Found roles: " + roles);
+         // Tạo danh sách UserRole  
         List<UserRole> userRoles = roles.stream()
             .map(role -> UserRole.builder()
+                // .user(user)
                 .user(user)
                 .role(role)
                 .grantedDate(new Date())
                 .build())
             .collect(Collectors.toList());
+        System.out.println("UserRoles created: " + userRoles.size());
+        user.getUserRoles().addAll(userRoles);
 
-        user.getUserRoles().addAll(userRoles); 
+        // Đợi URL ảnh và gán vào user
+        String userAvatarUrl = avatarFuture.get(); // Chặn ở đây để lấy URL
+        if (userAvatarUrl != null) {
+            user.setUserAvatar(userAvatarUrl);
+        }
 
         User userRegister= userRepositoryPort.save(user);
         return UserMapper.toDTO(userRegister);
@@ -108,9 +141,13 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId) throws Exception{
         User user = userRepositoryPort.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+        if (user.getUserAvatar() != null && !user.getUserAvatar().isEmpty()) {
+            String folder = "users/userAvatars/" + user.getUserName().getUserName();
+            cloudinaryService.deleteFolder(folder);
+        }
         userRepositoryPort.delete(user);
     }
 
@@ -128,7 +165,9 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
     }
     
     @Override
-    public UserDTO updateUser(Long userId, String userName, String email, String accountType, List<String> roleNames) {
+    public UserDTO updateUser(Long userId, String userName, String email, 
+                                String accountType, List<String> roleNames,
+                                MultipartFile userAvatar) throws Exception{
         // Tìm user theo userId
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
@@ -136,7 +175,25 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
         // Cập nhật các thuộc tính
         user.setUserName(new UserName(userName));
         user.setEmail(new UserEmail(email));
-        user.setAccountType(AccountType.valueOf(accountType.toUpperCase()));
+        user.setAccountType(AccountType.valueOf(accountType.toUpperCase()));        
+
+        CompletableFuture<String> avatarFuture = (userAvatar != null && !userAvatar.isEmpty())
+        ? CompletableFuture.supplyAsync(() -> {
+            try {
+                // Xóa avatar cũ nếu có
+                if (user.getUserAvatar() != null && !user.getUserAvatar().isEmpty()) {
+                    String oldPublicId = cloudinaryService.extractPublicIdFromUrl(user.getUserAvatar());
+                    if (oldPublicId != null) {
+                        cloudinaryService.deleteAvatar(oldPublicId);
+                    }
+                }
+                String folder = "users/userAvatars/" + userName;
+                return cloudinaryService.uploadAvatar(userAvatar, folder);
+            } catch (IOException e) {
+                throw new RuntimeException("Upload failed", e);
+            }
+        })
+        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
 
         // Xóa các UserRole cũ
         user.getUserRoles().clear();
@@ -156,8 +213,14 @@ public class UserServiceImpl implements RegisterService, FindUserService,DeleteU
         // Thêm UserRole mới vào user
         user.getUserRoles().addAll(userRoles);
 
+        // Đợi URL ảnh và gán vào user
+        String avatarUrl = avatarFuture.get(); // Chặn ở đây để lấy URL
+        if (avatarUrl != null) {
+            user.setUserAvatar(avatarUrl);
+        }
+
         // Lưu user đã cập nhật
-        User updatedUser = userRepositoryPort.save(user);
+        User updatedUser=userRepositoryPort.save(user);
         return UserMapper.toDTO(updatedUser);
     }
 

@@ -20,4 +20,5 @@ public class UserResponse {
     private Date createdDate;
     private List<String> permissions;
     private List<RoleDTO> roles;
+    private String avatar;
 }

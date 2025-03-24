@@ -30,6 +30,37 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.20</version>
+		</dependency>
+
+		<!-- cloudinary -->
+		<!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-core -->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-core</artifactId>
+			<version>1.38.0</version> <!-- Sử dụng phiên bản mới nhất -->
+		</dependency>
+    
+		<!-- Cloudinary HTTP44 (bao gồm UploaderStrategy cho HTTP Client 4.4) -->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>1.38.0</version>
+		</dependency>
+		
+		<!-- Apache HttpClient (cần thiết cho cloudinary-http44) -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.14</version> <!-- Phiên bản tương thích -->
+		</dependency>
+
+
+
 		<!-- jwt -->
 		<dependency>
             <groupId>io.jsonwebtoken</groupId>

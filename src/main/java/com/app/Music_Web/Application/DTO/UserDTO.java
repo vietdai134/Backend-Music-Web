@@ -20,5 +20,6 @@ public class UserDTO {
     // private String password;
     private AccountType accountType;
     private Date createdDate;
+    private String userAvatar;
     private List<RoleDTO> roles;
 }

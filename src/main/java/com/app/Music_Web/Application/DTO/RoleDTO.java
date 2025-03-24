@@ -1,4 +1,5 @@
 package com.app.Music_Web.Application.DTO;
+import java.util.Date;
 import java.util.List;
 
 import lombok.*;
@@ -14,4 +15,6 @@ public class RoleDTO {
     private String description;
 
     private List<PermissionDTO> permissions;
+
+    private Date grantedDate;
 }
