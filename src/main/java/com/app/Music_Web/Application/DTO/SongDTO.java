@@ -12,6 +12,6 @@ public class SongDTO {
     private String title;
     private String artist;
     private String song_image;
-    private String source_url;
+    private String fileSongId;
     private boolean downloadable;
 }

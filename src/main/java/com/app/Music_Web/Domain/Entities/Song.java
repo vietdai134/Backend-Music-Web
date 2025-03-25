@@ -43,8 +43,8 @@ public class Song {
     @Column(name="song_image",nullable = false)
     private String songImage;
 
-    @Column(name="source_url",nullable = true)
-    private String sourceUrl;
+    @Column(name="file_song_id",nullable = false)
+    private String fileSongId;
 
     @Column(name="downloadable",nullable = false)
     private boolean downloadable;

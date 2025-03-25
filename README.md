@@ -40,3 +40,6 @@ openssl pkcs12 -export -in certificate.crt -inkey private.key -out keystore.p12 
 3. cấu hình trong application.properties:
 server.ssl.key-store-password=mypassword
 server.ssl.key-alias=mycert
+
+Tạo file json để sử dụng google drive api:
+Tham khảo tại: https://youtu.be/rANfiSmyMTQ?si=hPKqqhrMmt_REmQX

@@ -10,7 +10,8 @@ public class SongRequest {
     private String title;
     private String artist;
     private String song_image;
-    private String source_url;
+    // private String songFileId;
+    private byte[] songFileData;
     private boolean downloadable;
 
 }

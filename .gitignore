@@ -32,4 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
+###open ssl###
 ssl/
+
+###google drive api###
+cred.json

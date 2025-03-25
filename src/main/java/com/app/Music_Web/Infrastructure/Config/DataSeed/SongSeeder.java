@@ -26,7 +26,7 @@ public class SongSeeder {
                         .title(new SongTitle("Bohemian Rhapsody"))
                         .artist(new SongArtist("Queen"))
                         .songImage("bohemian_rhapsody.jpg")
-                        .sourceUrl("https://example.com/bohemian_rhapsody.mp3")
+                        .fileSongId("https://example.com/bohemian_rhapsody.mp3")
                         .downloadable(true)
                         .build(),
 
@@ -34,7 +34,7 @@ public class SongSeeder {
                         .title(new SongTitle("Take Five"))
                         .artist(new SongArtist("Dave Brubeck"))
                         .songImage("take_five.jpg")
-                        .sourceUrl("https://example.com/take_five.mp3")
+                        .fileSongId("https://example.com/take_five.mp3")
                         .downloadable(true)
                         .build(),
 
@@ -42,7 +42,7 @@ public class SongSeeder {
                         .title(new SongTitle("Lose Yourself"))
                         .artist(new SongArtist("Eminem"))
                         .songImage("lose_yourself.jpg")
-                        .sourceUrl("https://example.com/lose_yourself.mp3")
+                        .fileSongId("https://example.com/lose_yourself.mp3")
                         .downloadable(false)
                         .build(),
 
@@ -50,7 +50,7 @@ public class SongSeeder {
                         .title(new SongTitle("Moonlight Sonata"))
                         .artist(new SongArtist("Ludwig van Beethoven"))
                         .songImage("moonlight_sonata.jpg")
-                        .sourceUrl("https://example.com/moonlight_sonata.mp3")
+                        .fileSongId("https://example.com/moonlight_sonata.mp3")
                         .downloadable(true)
                         .build(),
 
@@ -58,7 +58,7 @@ public class SongSeeder {
                         .title(new SongTitle("Blinding Lights"))
                         .artist(new SongArtist("The Weeknd"))
                         .songImage("blinding_lights.jpg")
-                        .sourceUrl("https://example.com/blinding_lights.mp3")
+                        .fileSongId("https://example.com/blinding_lights.mp3")
                         .downloadable(true)
                         .build(),
 
@@ -66,7 +66,7 @@ public class SongSeeder {
                         .title(new SongTitle("Sweet Child O' Mine"))
                         .artist(new SongArtist("Guns N' Roses"))
                         .songImage("sweet_child_o_mine.jpg")
-                        .sourceUrl("https://example.com/sweet_child_o_mine.mp3")
+                        .fileSongId("https://example.com/sweet_child_o_mine.mp3")
                         .downloadable(false)
                         .build(),
 
@@ -74,7 +74,7 @@ public class SongSeeder {
                         .title(new SongTitle("Fly Me to the Moon"))
                         .artist(new SongArtist("Frank Sinatra"))
                         .songImage("fly_me_to_the_moon.jpg")
-                        .sourceUrl("https://example.com/fly_me_to_the_moon.mp3")
+                        .fileSongId("https://example.com/fly_me_to_the_moon.mp3")
                         .downloadable(true)
                         .build(),
 
@@ -82,7 +82,7 @@ public class SongSeeder {
                         .title(new SongTitle("Rolling in the Deep"))
                         .artist(new SongArtist("Adele"))
                         .songImage("rolling_in_the_deep.jpg")
-                        .sourceUrl("https://example.com/rolling_in_the_deep.mp3")
+                        .fileSongId("https://example.com/rolling_in_the_deep.mp3")
                         .downloadable(false)
                         .build(),
 
@@ -90,7 +90,7 @@ public class SongSeeder {
                         .title(new SongTitle("Viva La Vida"))
                         .artist(new SongArtist("Coldplay"))
                         .songImage("viva_la_vida.jpg")
-                        .sourceUrl("https://example.com/viva_la_vida.mp3")
+                        .fileSongId("https://example.com/viva_la_vida.mp3")
                         .downloadable(true)
                         .build(),
 
@@ -98,7 +98,7 @@ public class SongSeeder {
                         .title(new SongTitle("Shape of You"))
                         .artist(new SongArtist("Ed Sheeran"))
                         .songImage("shape_of_you.jpg")
-                        .sourceUrl("https://example.com/shape_of_you.mp3")
+                        .fileSongId("https://example.com/shape_of_you.mp3")
                         .downloadable(true)
                         .build()
                 );

@@ -29,12 +29,12 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
     }
 
     @Override
-    public SongDTO saveSong(String title, String artist, String song_image, String source_url, boolean downloadable) {
+    public SongDTO saveSong(String title, String artist, String song_image, String fileSongId, boolean downloadable) {
         Song song = Song.builder()
                         .title(new SongTitle(title))
                         .artist(new SongArtist(artist))
                         .songImage(song_image)
-                        .sourceUrl(source_url)
+                        .fileSongId(fileSongId)
                         .downloadable(downloadable)
                         .build();
         Song saveSong = songRepositoryPort.save(song);
