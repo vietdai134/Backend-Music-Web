@@ -1,5 +1,7 @@
 package com.app.Music_Web.API.Controllers;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +56,19 @@ public class GenreController {
         );
 
         return ResponseEntity.ok(genreResponses);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<GenreResponse>> getListAllGenres() {
+        List<GenreDTO> genres = findGenreService.findAll();
+        List<GenreResponse> genreResponses =genres.stream()
+                    .map(genre-> GenreResponse.builder()
+                        .genreId(genre.getGenreId())
+                        .genreName(genre.getGenreName())
+                        .build())
+                    .toList();
+        return ResponseEntity.ok(genreResponses);
+        
     }
 
     @GetMapping("/{genreId}")

@@ -1,5 +1,9 @@
 package com.app.Music_Web.API.Request;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.*;
 
 @Getter
@@ -9,9 +13,11 @@ import lombok.*;
 public class SongRequest {
     private String title;
     private String artist;
-    private String song_image;
+    private MultipartFile songImage;
     // private String songFileId;
-    private byte[] songFileData;
+    // private byte[] songFileData;
+    private MultipartFile songFileData;
     private boolean downloadable;
 
+    private List<String> genreNames;
 }

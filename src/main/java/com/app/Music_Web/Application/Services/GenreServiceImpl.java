@@ -1,5 +1,7 @@
 package com.app.Music_Web.Application.Services;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -83,6 +85,14 @@ public class GenreServiceImpl implements FindGenreService, SaveGenreService,Dele
     public Page<GenreDTO> searchByGenreName(String keyword, Pageable pageable) {
         Page<Genre> genre = genreRepositoryPort.searchByGenreName(keyword, pageable);
         return genre.map(GenreMapper::toDTO);
+    }
+
+    @Override
+    public List<GenreDTO> findAll() {
+        List<Genre> genres = genreRepositoryPort.findAll();
+        return genres.stream()
+                    .map(GenreMapper::toDTO)
+                    .toList();
     }
     
 }

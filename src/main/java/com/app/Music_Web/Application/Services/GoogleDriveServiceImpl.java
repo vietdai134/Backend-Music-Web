@@ -22,6 +22,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 
 import jakarta.annotation.PostConstruct;
 
+
 @Service
 public class GoogleDriveServiceImpl implements GoogleDriveService{
     private final GoogleCredentials googleCredentials;
@@ -80,7 +81,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService{
     }
 
     public String getFileInfo( String accessToken,String fileId) {
-        String url = GOOGLE_DRIVE_FILES_URL + "/" + fileId;
+        String url = GOOGLE_DRIVE_FILES_URL + "/" + fileId+"?fields=name,mimeType,size,kind";
         HttpHeaders headers = createHeaders(accessToken);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
@@ -199,6 +200,23 @@ public class GoogleDriveServiceImpl implements GoogleDriveService{
         byte[] fileData = response.getBody();
         System.out.println("📥 Tải xuống thành công. Kích thước: " + fileData.length + " bytes");
         return fileData;
+    }
+
+
+
+    public String getFileName(String accessToken, String fileId) {
+        try {
+            String fileInfoJson = getFileInfo(accessToken, fileId);
+            
+            // Parse JSON để lấy tên file
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(fileInfoJson);
+            
+            return rootNode.has("name") ? rootNode.get("name").asText() : "UnknownSong.mp3";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "UnknownSong.mp3"; // Trả về tên mặc định nếu có lỗi
+        }
     }
 
 

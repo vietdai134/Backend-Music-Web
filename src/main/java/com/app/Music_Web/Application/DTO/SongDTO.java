@@ -1,5 +1,8 @@
 package com.app.Music_Web.Application.DTO;
 
+import java.util.Date;
+import java.util.List;
+
 import lombok.*;
 
 @Getter
@@ -8,10 +11,14 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class SongDTO {
-    private Long id;
+    private Long songId;
     private String title;
     private String artist;
-    private String song_image;
+    private String songImage;
     private String fileSongId;
     private boolean downloadable;
+    // private SongApprovalDTO songApprovalDTO;
+    private Date approvedDate;
+    private List<GenreDTO> genres;
+    private String userName;
 }

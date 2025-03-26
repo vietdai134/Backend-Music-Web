@@ -1,5 +1,7 @@
 package com.app.Music_Web.Infrastructure.Persistence.Repositories;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +18,7 @@ public interface GenreRepository extends JpaRepository<Genre,Long>,GenreReposito
     @Query("SELECT g FROM Genre g " +
            "WHERE LOWER(g.genreName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Genre> searchByGenreName(@Param("keyword") String keyword,Pageable pageable);
+
+    @Query("SELECT g FROM Genre g WHERE g.genreName.genreName IN :names")
+    List<Genre> findByGenreNameIn(@Param("names") List<String> names);
 }

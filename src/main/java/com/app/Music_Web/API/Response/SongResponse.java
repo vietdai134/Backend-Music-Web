@@ -1,5 +1,7 @@
 package com.app.Music_Web.API.Response;
 
+import java.util.Date;
+
 import lombok.*;
 
 @Getter
@@ -8,8 +10,13 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class SongResponse {
-    private Long id;
+    private Long songId;
     private String title;
-
+    private String artist;
+    private String fileSongId;
+    private String songImage;
+    private boolean downloadable;
+    private Date approvedDate;
+    private String userName;
 
 }

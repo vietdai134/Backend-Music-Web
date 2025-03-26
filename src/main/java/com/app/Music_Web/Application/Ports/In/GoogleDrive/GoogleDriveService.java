@@ -10,4 +10,5 @@ public interface GoogleDriveService {
     String updateFileName(String accessToken, String fileId, String newName);
     void deleteFile(String accessToken,String fileId);
     byte[] downloadFile(String accessToken,String fileId);
+    String getFileName(String accessToken, String fileId);
 }
