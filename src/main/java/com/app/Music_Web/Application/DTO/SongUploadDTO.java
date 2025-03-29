@@ -11,6 +11,6 @@ import lombok.*;
 public class SongUploadDTO {
     private Long uploadId;
     private Date uploadDate;
-    private String uploadedBy;
+    private Long uploadedBy;
     private Long songId;
 }

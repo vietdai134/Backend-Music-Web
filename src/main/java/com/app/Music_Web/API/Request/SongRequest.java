@@ -14,10 +14,22 @@ public class SongRequest {
     private String title;
     private String artist;
     private MultipartFile songImage;
-    // private String songFileId;
-    // private byte[] songFileData;
     private MultipartFile songFileData;
     private boolean downloadable;
 
     private List<String> genreNames;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class  SongUpdateRequest {
+        private String title;
+        private String artist;
+        private MultipartFile songImage;
+        private String songFileId;
+        private boolean downloadable;
+    
+        private List<String> genreNames;
+    }
 }

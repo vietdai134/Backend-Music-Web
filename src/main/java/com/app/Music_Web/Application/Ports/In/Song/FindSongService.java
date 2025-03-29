@@ -13,4 +13,6 @@ public interface FindSongService {
     SongDTO findBySongArtist (String songArtist);
 
     Long findByFileSongId(String fileSongId);
+
+    SongDTO findBySongId(Long songId);
 }

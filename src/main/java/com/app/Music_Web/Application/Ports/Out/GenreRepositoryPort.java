@@ -18,4 +18,8 @@ public interface GenreRepositoryPort {
     Genre findByGenreId(Long genreId);
 
     List<Genre> findByGenreNameIn(List<String> genreNames);
+
+    List<Genre> findGenresBySongId(List<Long> songId);
+
+    List<Genre> findGenresBySongId(Long songId);
 } 

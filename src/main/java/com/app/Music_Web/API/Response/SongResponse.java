@@ -1,6 +1,9 @@
 package com.app.Music_Web.API.Response;
 
 import java.util.Date;
+import java.util.List;
+
+import com.app.Music_Web.Application.DTO.GenreDTO;
 
 import lombok.*;
 
@@ -18,5 +21,7 @@ public class SongResponse {
     private boolean downloadable;
     private Date approvedDate;
     private String userName;
+
+    private List<GenreDTO> genres;
 
 }

@@ -21,4 +21,20 @@ public interface GenreRepository extends JpaRepository<Genre,Long>,GenreReposito
 
     @Query("SELECT g FROM Genre g WHERE g.genreName.genreName IN :names")
     List<Genre> findByGenreNameIn(@Param("names") List<String> names);
+
+    @Override
+    @Query("SELECT g "+
+            "FROM Genre g "+
+            "LEFT JOIN g.songGenres sg "+
+            "LEFT JOIN sg.song s "+
+            "WHERE s.songId IN :songId")
+    List<Genre> findGenresBySongId(@Param("songId") List<Long> songId);
+
+    @Override
+    @Query("SELECT g "+
+            "FROM Genre g "+
+            "LEFT JOIN g.songGenres sg "+
+            "LEFT JOIN sg.song s "+
+            "WHERE s.songId = :songId")
+    List<Genre> findGenresBySongId(@Param("songId") Long songId);
 }

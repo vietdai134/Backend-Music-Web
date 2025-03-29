@@ -94,5 +94,13 @@ public class GenreServiceImpl implements FindGenreService, SaveGenreService,Dele
                     .map(GenreMapper::toDTO)
                     .toList();
     }
+
+    @Override
+    public List<GenreDTO> findGenreBySongId(Long songId) {
+        List<Genre> genres = genreRepositoryPort.findGenresBySongId(songId);
+        return genres.stream()
+                    .map(GenreMapper::toDTO)
+                    .toList();
+    }
     
 }

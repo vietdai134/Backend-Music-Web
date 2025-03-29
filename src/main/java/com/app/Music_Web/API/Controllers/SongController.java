@@ -1,17 +1,24 @@
 package com.app.Music_Web.API.Controllers;
 
 import com.app.Music_Web.API.Request.SongRequest;
+import com.app.Music_Web.API.Request.SongRequest.SongUpdateRequest;
 import com.app.Music_Web.API.Response.SongResponse;
+import com.app.Music_Web.Application.DTO.GenreDTO;
 import com.app.Music_Web.Application.DTO.SongDTO;
+import com.app.Music_Web.Application.Ports.In.Genre.FindGenreService;
 import com.app.Music_Web.Application.Ports.In.GoogleDrive.GoogleDriveService;
 import com.app.Music_Web.Application.Ports.In.Song.DeleteSongService;
 import com.app.Music_Web.Application.Ports.In.Song.FindSongService;
 import com.app.Music_Web.Application.Ports.In.Song.SaveSongService;
+import com.app.Music_Web.Application.Ports.In.Song.UpdateSongService;
 import com.app.Music_Web.Application.Ports.In.SongApproval.SaveSongApprovalService;
+import com.app.Music_Web.Application.Ports.In.SongUpload.SaveSongUploadService;
 import com.app.Music_Web.Domain.Enums.ApprovalStatus;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -32,18 +39,28 @@ public class SongController {
     private final FindSongService findSongService;
     private final SaveSongService saveSongService;
     private final DeleteSongService deleteSongService;
+    private final UpdateSongService updateSongService;
     private final GoogleDriveService googleDriveService;
     private final SaveSongApprovalService saveSongApprovalService;
+    private final SaveSongUploadService saveSongUploadService;
+    private final FindGenreService findGenreService;
+
     public SongController(FindSongService findSongService, 
                             SaveSongService saveSongService,
                             DeleteSongService deleteSongService,
+                            UpdateSongService updateSongService,
                             GoogleDriveService googleDriveService,
-                            SaveSongApprovalService saveSongApprovalService) {
+                            SaveSongApprovalService saveSongApprovalService,
+                            SaveSongUploadService saveSongUploadService,
+                            FindGenreService findGenreService) {
         this.saveSongService = saveSongService;
         this.findSongService = findSongService;
         this.deleteSongService=deleteSongService;
+        this.updateSongService=updateSongService;
         this.googleDriveService=googleDriveService;
         this.saveSongApprovalService=saveSongApprovalService;
+        this.saveSongUploadService=saveSongUploadService;
+        this.findGenreService=findGenreService;
     }
 
 
@@ -69,29 +86,91 @@ public class SongController {
 
     @PostMapping
     public ResponseEntity<Void> createSong(@ModelAttribute SongRequest request,
-                                            @AuthenticationPrincipal UserDetails userDetails) throws Exception{
-        String accessToken=googleDriveService.getAccessToken();
-        byte[] songFileData= request.getSongFileData().getBytes();
-        String fileId = googleDriveService.uploadFile(songFileData
-                                        , request.getArtist()+"-"+request.getTitle()+".mp3", 
-                                        accessToken);
-        saveSongService.saveSong(request.getTitle(),
-                                request.getArtist(),
-                                request.getSongImage(),
-                                fileId,
-                                request.getGenreNames(),
-                                request.isDownloadable());
-
-        // Lưu vào song approval
-        Long songId= findSongService.findByFileSongId(fileId);
-        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
-        Long userId=customUserDetails.getUserId();
-        ApprovalStatus status = ApprovalStatus.valueOf("APPROVED".toUpperCase());
-        saveSongApprovalService.saveSongApproval(songId, userId,status);
-
-        
+                                           @AuthenticationPrincipal UserDetails userDetails) throws Exception {
+        String accessToken = googleDriveService.getAccessToken();
+        byte[] songFileData = request.getSongFileData().getBytes();
+        String fileName = request.getArtist() + "-" + request.getTitle() + ".mp3";
+    
+        // Bước 1: Upload file lên Google Drive
+        CompletableFuture<String> uploadFileFuture = CompletableFuture.supplyAsync(() -> 
+            googleDriveService.uploadFile(songFileData, fileName, accessToken)
+        );
+    
+        // Bước 2: Lưu bài hát vào DB (chạy ngay sau khi có fileId)
+        CompletableFuture<Long> saveSongAndFindIdFuture = uploadFileFuture.thenCompose(fileId -> {
+            return CompletableFuture.runAsync(() -> 
+                {
+                    try {
+                        saveSongService.saveSong(
+                            request.getTitle(),
+                            request.getArtist(),
+                            request.getSongImage(),
+                            fileId,
+                            request.getGenreNames(),
+                            request.isDownloadable()
+                        );
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            ).thenApply(ignored -> findSongService.findByFileSongId(fileId)); // Sau khi lưu xong, lấy songId
+        });
+    
+        // Bước 3: Khi có songId, chạy saveSongApproval & saveSongUpload song song
+        CompletableFuture<Void> finalFuture = saveSongAndFindIdFuture.thenAccept(songId -> {
+            CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+            Long userId = customUserDetails.getUserId();
+            ApprovalStatus status = ApprovalStatus.APPROVED;
+    
+            CompletableFuture<Void> saveApprovalFuture = CompletableFuture.runAsync(() -> 
+                saveSongApprovalService.saveSongApproval(songId, userId, status)
+            );
+    
+            CompletableFuture<Void> saveUploadFuture = CompletableFuture.runAsync(() -> 
+                saveSongUploadService.saveSongUpload(songId, userId)
+            );
+    
+            // Đợi cả hai tác vụ hoàn tất
+            CompletableFuture.allOf(saveApprovalFuture, saveUploadFuture).join();
+        });
+    
+        // Đợi tất cả hoàn thành trước khi trả về response
+        finalFuture.join();
+    
         return ResponseEntity.ok().build();
     }
+    
+
+    // @PostMapping
+    // public ResponseEntity<Void> createSong(@ModelAttribute SongRequest request,
+    //                                         @AuthenticationPrincipal UserDetails userDetails) throws Exception{
+    //     String accessToken=googleDriveService.getAccessToken();
+    //     byte[] songFileData= request.getSongFileData().getBytes();
+    //     String fileId = googleDriveService.uploadFile(songFileData
+    //                                     , request.getArtist()+"-"+request.getTitle()+".mp3", 
+    //                                     accessToken);
+                                        
+    //     saveSongService.saveSong(request.getTitle(),
+    //                             request.getArtist(),
+    //                             request.getSongImage(),
+    //                             fileId,
+    //                             request.getGenreNames(),
+    //                             request.isDownloadable());
+
+    //     Long songId= findSongService.findByFileSongId(fileId);
+    //     CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+    //     Long userId=customUserDetails.getUserId();
+        
+    //     // Lưu vào song approval
+    //     ApprovalStatus status = ApprovalStatus.valueOf("APPROVED".toUpperCase());
+    //     saveSongApprovalService.saveSongApproval(songId, userId,status);
+
+    //     // Lưu vào song upload
+    //     saveSongUploadService.saveSongUpload(songId, userId);                                      
+
+        
+    //     return ResponseEntity.ok().build();
+    // }
 
     // Cập nhật tên file
     @PatchMapping("/files/{fileId}")
@@ -133,17 +212,6 @@ public class SongController {
                 .body(resource);
     }
 
-    // @GetMapping("/all")
-    // public Page<SongResponse> getAllSongs(@RequestParam(defaultValue = "0") int page,
-    //                                      @RequestParam(defaultValue = "10") int size) {
-    //     Pageable pageable = PageRequest.of(page, size,Sort.unsorted());
-    //     Page<SongDTO> songs = findSongService.findAll(pageable);
-    //     return songs.map(song-> SongResponse.builder()
-    //                                         .id(song.getId())
-    //                                         .title(song.getTitle())
-    //                                         .build());
-    // }
-
     @GetMapping("/all")
     public Page<SongResponse> getAllSongs(
             @RequestParam(defaultValue = "0") int page,
@@ -165,10 +233,27 @@ public class SongController {
                 .artist(song.getArtist())
                 .fileSongId(song.getFileSongId())
                 .songImage(song.getSongImage())
+                .genres(song.getGenres())
                 .approvedDate(song.getApprovedDate())
                 .downloadable(song.isDownloadable())
                 .userName(song.getUserName())
                 .build());
+    }
+    
+    @GetMapping("/{songId}")
+    public ResponseEntity<SongResponse> getSongById(@PathVariable Long songId){
+        SongDTO song= findSongService.findBySongId(songId);
+        List<GenreDTO> genres = findGenreService.findGenreBySongId(songId);
+        SongResponse songResponse = SongResponse.builder()
+                            .songId(songId)
+                            .title(song.getTitle())
+                            .artist(song.getArtist())
+                            .fileSongId(song.getFileSongId())
+                            .songImage(song.getSongImage())
+                            .genres(genres)
+                            .downloadable(song.isDownloadable())
+                            .build();
+        return ResponseEntity.ok(songResponse);
     }
 
     @GetMapping("/search")
@@ -190,5 +275,26 @@ public class SongController {
     public ResponseEntity<Void> deleteGenre(@PathVariable Long songId){
         deleteSongService.deleteSong(songId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/update/{songId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateUser(
+            @PathVariable Long songId,
+            @ModelAttribute SongUpdateRequest request) throws Exception {
+        System.out.println("Updating userId=" + songId + ", avatar=" + 
+        (request.getSongImage() != null ? request.getSongImage().getOriginalFilename() : "null"));
+        String accessToken = googleDriveService.getAccessToken();
+        String fileName = request.getArtist() + "-" + request.getTitle() + ".mp3";
+        googleDriveService.updateFileName(accessToken, request.getSongFileId(), fileName);
+
+        updateSongService.updateSong(
+                songId,
+                request.getTitle(),
+                request.getArtist(),
+                request.getSongFileId(),
+                request.getSongImage(),
+                request.getGenreNames(),
+                request.isDownloadable());
+        return ResponseEntity.ok().build();
     }
 }

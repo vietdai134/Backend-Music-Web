@@ -14,5 +14,6 @@ public interface FindGenreService {
     // GenreDTO findByGenreName (String genreName);
     GenreDTO findByGenreId(Long genreId);
 
+    List<GenreDTO> findGenreBySongId(Long songId);
     
 }
