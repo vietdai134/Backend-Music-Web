@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.Music_Web.Application.DTO.SongApprovalDTO;
 import com.app.Music_Web.Application.Ports.In.SongApproval.SaveSongApprovalService;
+import com.app.Music_Web.Application.Ports.In.SongApproval.UpdateSongApprovalService;
 import com.app.Music_Web.Application.Ports.Out.SongApprovalRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.SongRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
@@ -15,8 +16,10 @@ import com.app.Music_Web.Domain.Entities.SongApproval;
 import com.app.Music_Web.Domain.Entities.User;
 import com.app.Music_Web.Domain.Enums.ApprovalStatus;
 
+import jakarta.transaction.Transactional;
+
 @Service
-public class SongApprovalServiceImpl implements SaveSongApprovalService{
+public class SongApprovalServiceImpl implements SaveSongApprovalService, UpdateSongApprovalService{
     private final SongApprovalRepositoryPort songApprovalRepositoryPort;
     private final SongRepositoryPort songRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
@@ -57,5 +60,11 @@ public class SongApprovalServiceImpl implements SaveSongApprovalService{
                 .songId(savedApproval.getSong().getSongId())
                 .approvedBy(savedApproval.getUser().getUserId())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void changeStatusSong(Long songId, ApprovalStatus approvalStatus){
+        songApprovalRepositoryPort.updateStatusSong(songId, approvalStatus);
     }
 }

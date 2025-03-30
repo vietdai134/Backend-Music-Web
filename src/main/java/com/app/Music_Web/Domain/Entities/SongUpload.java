@@ -5,6 +5,7 @@ import java.util.Date;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -24,7 +25,9 @@ import jakarta.persistence.GenerationType;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "song_upload")
+@Table(name = "song_upload", indexes = {
+    @Index(name = "idx_upload_date", columnList = "upload_date")
+})
 public class SongUpload {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

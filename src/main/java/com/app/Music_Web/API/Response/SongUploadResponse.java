@@ -1,19 +1,19 @@
-package com.app.Music_Web.Application.DTO;
+package com.app.Music_Web.API.Response;
 
 import java.util.Date;
+
+import com.app.Music_Web.Application.DTO.SongDTO;
+
 import lombok.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class SongUploadDTO {
+public class SongUploadResponse {
     private Long uploadId;
     private Date uploadDate;
-    private Long uploadedBy;
-    private Long songId;
-
     private SongDTO songDto;
     private String userName;
 }

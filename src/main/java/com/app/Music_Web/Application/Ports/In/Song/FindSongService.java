@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 public interface FindSongService {
     Page<SongDTO> findAll(Pageable pageable);
     Page<SongDTO> findAllWithStatus(ApprovalStatus status, Pageable pageable);
+    Page<SongDTO> searchByTitleOrArtist(String keyword, ApprovalStatus status, Pageable pageable);
+    
     SongDTO findBySongTitle (String songTitle);
     SongDTO findBySongArtist (String songArtist);
 

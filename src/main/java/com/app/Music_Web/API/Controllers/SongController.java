@@ -257,18 +257,32 @@ public class SongController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> getSongByTitle(@RequestParam String songTitle) {
-        SongDTO song = findSongService.findBySongTitle(songTitle);
-        if (song == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Song not found");
-        }
+    public Page<SongResponse> searchAllSongs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "APPROVED") String approvalStatus) { // Thêm tham số approvalStatus
+        // Tạo Pageable với phân trang, mặc định không sắp xếp
+        Pageable pageable = PageRequest.of(page, size, Sort.unsorted());
 
-        SongResponse response = SongResponse.builder()
+        // Chuyển đổi String thành ApprovalStatus
+        ApprovalStatus status = ApprovalStatus.valueOf(approvalStatus.toUpperCase());
+
+        // Gọi findAllWithStatus thay vì findAll
+        Page<SongDTO> songs = findSongService.searchByTitleOrArtist(keyword,status, pageable);
+
+        // Ánh xạ sang SongResponse
+        return songs.map(song -> SongResponse.builder()
                 .songId(song.getSongId())
                 .title(song.getTitle())
-                .build();
-
-        return ResponseEntity.ok(response);
+                .artist(song.getArtist())
+                .fileSongId(song.getFileSongId())
+                .songImage(song.getSongImage())
+                .genres(song.getGenres())
+                .approvedDate(song.getApprovedDate())
+                .downloadable(song.isDownloadable())
+                .userName(song.getUserName())
+                .build());
     }
 
     @DeleteMapping("/{songId}")
@@ -297,4 +311,5 @@ public class SongController {
                 request.isDownloadable());
         return ResponseEntity.ok().build();
     }
+
 }

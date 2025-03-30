@@ -231,5 +231,39 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
         Song updatedSong=songRepositoryPort.save(song);
         return SongMapper.toDTO(updatedSong);
     }
+
+    @Override
+    public Page<SongDTO> searchByTitleOrArtist(String keyword, ApprovalStatus status, Pageable pageable) {
+        Page<Object[]> result= songRepositoryPort.searchByTitleOrArtist(keyword, status, pageable);
+        List<Long> songIds= result.stream()
+                                .map(row -> (Long) row[0])
+                                .collect(Collectors.toList());
+        List<Genre> genres=genreRepositoryPort.findGenresBySongId(songIds);
+
+        Map<Long, List<GenreDTO>> genresBySongId = genres.stream()
+            .flatMap(genre -> genre.getSongGenres().stream()
+                .map(sg -> new AbstractMap.SimpleEntry<>(sg.getSong().getSongId(), GenreMapper.toDTO(genre)))
+            )
+            .filter(entry -> entry.getKey() != null && songIds.contains(entry.getKey())) // Đảm bảo songId hợp lệ
+            .collect(Collectors.groupingBy(Map.Entry::getKey, 
+                Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+                
+        return result.map(row -> {
+            Long songId = (Long) row[0];
+            return SongDTO.builder()
+                .songId((Long) row[0])
+                .title((String) row[1])
+                .artist((String) row[2])
+                .songImage((String) row[3])
+                .fileSongId((String) row[4])
+                .downloadable((Boolean) row[5])
+                .approvedDate((Date) row[6])
+                .userName((String) row[7])
+                .genres(genresBySongId.getOrDefault(
+                    songId, 
+                    Collections.emptyList()))
+                .build();
+        });
+    }
  
 }
