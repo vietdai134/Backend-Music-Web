@@ -44,4 +44,25 @@ public class SongUploadController {
         .userName(song.getUserName())
         .build());
     }
+
+    @GetMapping("/search")
+    public Page<SongUploadResponse> searchAllUploadSongsWithStatus(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam String keyword,
+        @RequestParam(defaultValue = "PENDING") String approvalStatus
+    ){
+        Pageable pageable=PageRequest.of(page, size,Sort.unsorted());
+
+        ApprovalStatus status = ApprovalStatus.valueOf(approvalStatus.toUpperCase());
+
+        Page<SongUploadDTO> songsUpload= findSongUploadService.searchUploadByTitleOrArtist(keyword,status, pageable);
+
+        return songsUpload.map(song -> SongUploadResponse.builder()
+        .uploadId(song.getUploadId())
+        .uploadDate(song.getUploadDate())
+        .songDto(song.getSongDto())
+        .userName(song.getUserName())
+        .build());
+    }
 }

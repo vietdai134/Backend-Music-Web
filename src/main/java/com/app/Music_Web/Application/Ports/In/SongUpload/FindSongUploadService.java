@@ -9,4 +9,7 @@ import com.app.Music_Web.Domain.Enums.ApprovalStatus;
 public interface FindSongUploadService {
     Page<SongUploadDTO> findAllWithSong (ApprovalStatus approvalStatus,
                                             Pageable pageable);
+
+    Page<SongUploadDTO> searchUploadByTitleOrArtist(String keyword, ApprovalStatus status, 
+                                    Pageable pageable);
 }

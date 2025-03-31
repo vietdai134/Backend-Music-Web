@@ -30,8 +30,8 @@ public interface SongRepository extends JpaRepository<Song, Long>, SongRepositor
            "LEFT JOIN s.songApprovals sa " +
            "LEFT JOIN sa.user u " +
            "WHERE sa.approvalStatus = :status "+
-           "AND LOWER(s.title.title) LIKE LOWER(CONCAT('%', :keyword, '%')) "+
-           "OR LOWER(s.artist.artist) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+           "AND (LOWER(s.title.title) LIKE LOWER(CONCAT('%', :keyword, '%')) "+
+           "OR LOWER(s.artist.artist) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<Object[]> searchByTitleOrArtist(@Param("keyword") String keyword,
                 @Param("status") ApprovalStatus status, Pageable pageable);
 

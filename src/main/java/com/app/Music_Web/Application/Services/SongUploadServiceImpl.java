@@ -71,5 +71,22 @@ public class SongUploadServiceImpl implements SaveSongUploadService, FindSongUpl
         // .uploadedBy((Long) objects[8])        // u.userId
         .build());
     }
+    @Override
+    public Page<SongUploadDTO> searchUploadByTitleOrArtist(String keyword, ApprovalStatus status, Pageable pageable) {
+        Page<Object[]> result= songUploadRepositoryPort.searchUploadByTitleOrArtist(keyword,status, pageable);
+        return result.map(objects -> SongUploadDTO.builder()
+        .uploadId((Long) objects[0])          // su.uploadId
+        .uploadDate((Date) objects[1])        // su.uploadDate
+        .songDto(SongDTO.builder()
+            .title((String) objects[2])       // s.title.title
+            .artist((String) objects[3])      // s.artist.artist
+            .songImage((String) objects[4])   // s.songImage
+            .fileSongId((String) objects[5])  // s.fileSongId
+            .build())
+        .userName((String) objects[6])        // u.userName.userName
+        // .songId((Long) objects[7])            // s.songId
+        // .uploadedBy((Long) objects[8])        // u.userId
+        .build());
+    }
     
 }

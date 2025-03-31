@@ -4,4 +4,5 @@ import com.app.Music_Web.Domain.Enums.ApprovalStatus;
 
 public interface UpdateSongApprovalService {
     void changeStatusSong(Long songId, ApprovalStatus approvalStatus);
+    void changeStatusUploadSong(Long uploadId, ApprovalStatus approvalStatus);
 }

@@ -29,4 +29,13 @@ public class SongApprovalController {
         updateSongApprovalService.changeStatusSong(songId, approvalStatus);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("upload-song/{uploadId}")
+    public ResponseEntity<Void> changeStatusUploadSong(
+        @PathVariable Long uploadId,
+        @RequestParam ApprovalStatus approvalStatus
+    ){
+        updateSongApprovalService.changeStatusUploadSong(uploadId, approvalStatus);
+        return ResponseEntity.ok().build();
+    }
 }

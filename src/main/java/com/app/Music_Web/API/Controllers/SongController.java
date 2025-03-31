@@ -25,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -292,7 +291,7 @@ public class SongController {
     }
 
     @PutMapping(value = "/update/{songId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateUser(
+    public ResponseEntity<Void> updateSong(
             @PathVariable Long songId,
             @ModelAttribute SongUpdateRequest request) throws Exception {
         System.out.println("Updating userId=" + songId + ", avatar=" + 

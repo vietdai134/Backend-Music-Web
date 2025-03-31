@@ -208,7 +208,8 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 throw new RuntimeException("Upload failed", e);
             }
         })
-        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
+        : CompletableFuture.completedFuture(song.getSongImage()); // Giữ nguyên ảnh cũ
+        // : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
 
         song.getSongGenres().clear();
 
