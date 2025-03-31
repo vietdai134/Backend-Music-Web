@@ -193,7 +193,8 @@ public class UserServiceImpl implements RegisterService, FindUserService,
                 throw new RuntimeException("Upload failed", e);
             }
         })
-        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
+        : CompletableFuture.completedFuture(user.getUserAvatar());
+        // : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
 
         // Xóa các UserRole cũ
         user.getUserRoles().clear();
