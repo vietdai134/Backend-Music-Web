@@ -15,13 +15,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.app.Music_Web.Infrastructure.Security.CustomLogoutSuccessHandler;
 import com.app.Music_Web.Infrastructure.Security.JwtRequestFilter;
 
 @Configuration
 public class SecurityConfig {
     private JwtRequestFilter jwtRequestFilter;
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+    private final CustomLogoutSuccessHandler logoutSuccessHandler;
+
+    public SecurityConfig(
+        JwtRequestFilter jwtRequestFilter,
+        CustomLogoutSuccessHandler logoutSuccessHandler
+        ) {
         this.jwtRequestFilter=jwtRequestFilter;
+        this.logoutSuccessHandler = logoutSuccessHandler;
     }
 
     @Bean
@@ -44,6 +51,11 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/api/albums/**").hasAuthority("SYSTEM_MANAGEMENT")
                 .anyRequest().authenticated()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")
+                .logoutSuccessHandler(logoutSuccessHandler)
+                .permitAll()
             )
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
