@@ -13,7 +13,7 @@ import com.app.Music_Web.Infrastructure.Persistence.Repositories.PermissionRepos
 @Configuration
 public class PermissionSeeder {
     @Bean
-    @Order(3)
+    @Order(1)
     CommandLineRunner seedPermissions (PermissionRepository permisionRepository){
         return args -> {
             if(permisionRepository.count()==0){

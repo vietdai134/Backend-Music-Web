@@ -55,7 +55,7 @@ public class UserServiceImpl implements RegisterService, FindUserService,
                         .accountType(AccountType.NORMAL)
                         .createdDate(new Date())
                         .userRoles(new ArrayList<>())
-                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg")
+                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg")
                         .build();
                         
         Role defaultRole = roleRepositoryPort.findByRoleName("USER");
@@ -97,7 +97,7 @@ public class UserServiceImpl implements RegisterService, FindUserService,
                 throw new RuntimeException("Upload failed", e);
             }
         })
-        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
+        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg");
 
         // Lấy danh sách các vai trò từ repository dựa trên danh sách tên vai trò
         List<Role> roles = roleRepositoryPort.findByRoleNameIn(roleNames);

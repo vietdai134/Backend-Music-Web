@@ -26,7 +26,7 @@ public class RolePermissionSeeder {
         this.roleRepository = roleRepository;
     }
     @Bean
-    @Order(5)
+    @Order(2)
     CommandLineRunner seedRolePermissions(RolePermissionRepository rolePermissionRepository) {
         return args -> {
             if (rolePermissionRepository.count() == 0) {
@@ -35,8 +35,9 @@ public class RolePermissionSeeder {
                 // Map<RoleID, List<PermissionID>>
                 Map<Long, List<Long>> rolePermissionMap = new HashMap<>();
                 rolePermissionMap.put(1L, List.of(1L, 2L, 3L, 4L));
-                rolePermissionMap.put(2L, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L));
-                rolePermissionMap.put(4L, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L));
+                rolePermissionMap.put(2L, List.of(5L, 6L, 7L));
+                rolePermissionMap.put(3L, List.of( 8L));
+                rolePermissionMap.put(4L, List.of( 9L));
     
                 for (Map.Entry<Long, List<Long>> entry : rolePermissionMap.entrySet()) {
                     Long roleId = entry.getKey();

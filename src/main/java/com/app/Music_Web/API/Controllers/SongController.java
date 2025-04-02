@@ -17,10 +17,13 @@ import com.app.Music_Web.Domain.Enums.ApprovalStatus;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -309,6 +312,19 @@ public class SongController {
                 request.getGenreNames(),
                 request.isDownloadable());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/stream/{songFileId}")
+    public ResponseEntity<Resource> streamSong(@PathVariable String songFileId) throws Exception {
+        String accessToken = googleDriveService.getAccessToken();
+        InputStream fileStream = googleDriveService.getFileStream(accessToken, songFileId);
+
+        InputStreamResource resource = new InputStreamResource(fileStream);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + songFileId + ".mp3\"")
+                .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .body(resource);
     }
 
 }

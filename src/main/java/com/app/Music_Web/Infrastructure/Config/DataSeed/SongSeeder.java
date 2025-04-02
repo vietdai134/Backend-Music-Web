@@ -10,11 +10,13 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 public class SongSeeder {
 
     @Bean
+    @Order(1)
     CommandLineRunner seedSongs(SongRepository songRepository) {
         return args -> {
             // Kiểm tra nếu bảng rỗng thì chèn dữ liệu
@@ -23,82 +25,82 @@ public class SongSeeder {
 
                 List<Song> songs = List.of(
                     Song.builder()
-                        .title(new SongTitle("Bohemian Rhapsody"))
-                        .artist(new SongArtist("Queen"))
-                        .songImage("bohemian_rhapsody.jpg")
-                        .fileSongId("https://example.com/bohemian_rhapsody.mp3")
+                        .title(new SongTitle("Playing God"))
+                        .artist(new SongArtist("Polyphia"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621896/songs/songImages/1UCICxA-4QVAz_OmZxVJwmVUR4L-ogev8/avatar.jpg")
+                        .fileSongId("1UCICxA-4QVAz_OmZxVJwmVUR4L-ogev8")
                         .downloadable(true)
                         .build(),
 
                     Song.builder()
-                        .title(new SongTitle("Take Five"))
-                        .artist(new SongArtist("Dave Brubeck"))
-                        .songImage("take_five.jpg")
-                        .fileSongId("https://example.com/take_five.mp3")
+                        .title(new SongTitle("O.D"))
+                        .artist(new SongArtist("Polyphia"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743622134/songs/songImages/1JPdDiXH_rXMdQnE0nkv4EekkyLaMKSJX/avatar.jpg")
+                        .fileSongId("1JPdDiXH_rXMdQnE0nkv4EekkyLaMKSJX")
                         .downloadable(true)
                         .build(),
 
                     Song.builder()
-                        .title(new SongTitle("Lose Yourself"))
-                        .artist(new SongArtist("Eminem"))
-                        .songImage("lose_yourself.jpg")
-                        .fileSongId("https://example.com/lose_yourself.mp3")
-                        .downloadable(false)
-                        .build(),
-
-                    Song.builder()
-                        .title(new SongTitle("Moonlight Sonata"))
-                        .artist(new SongArtist("Ludwig van Beethoven"))
-                        .songImage("moonlight_sonata.jpg")
-                        .fileSongId("https://example.com/moonlight_sonata.mp3")
+                        .title(new SongTitle("Ego Death feat Steve Vai"))
+                        .artist(new SongArtist("Polyphia"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743622620/songs/songImages/16dXr0iN15P2h2Gis9zvafMuuplYCkY5w/avatar.jpg")
+                        .fileSongId("16dXr0iN15P2h2Gis9zvafMuuplYCkY5w")
                         .downloadable(true)
                         .build(),
 
                     Song.builder()
-                        .title(new SongTitle("Blinding Lights"))
-                        .artist(new SongArtist("The Weeknd"))
-                        .songImage("blinding_lights.jpg")
-                        .fileSongId("https://example.com/blinding_lights.mp3")
+                        .title(new SongTitle("ABC feat Sophia Black"))
+                        .artist(new SongArtist("Polyphia"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743622876/songs/songImages/1aTGJjopIryBkdTa-4pFPBtNyMQOatcXV/avatar.jpg")
+                        .fileSongId("1aTGJjopIryBkdTa-4pFPBtNyMQOatcXV")
                         .downloadable(true)
                         .build(),
 
                     Song.builder()
-                        .title(new SongTitle("Sweet Child O' Mine"))
-                        .artist(new SongArtist("Guns N' Roses"))
-                        .songImage("sweet_child_o_mine.jpg")
-                        .fileSongId("https://example.com/sweet_child_o_mine.mp3")
-                        .downloadable(false)
-                        .build(),
-
-                    Song.builder()
-                        .title(new SongTitle("Fly Me to the Moon"))
-                        .artist(new SongArtist("Frank Sinatra"))
-                        .songImage("fly_me_to_the_moon.jpg")
-                        .fileSongId("https://example.com/fly_me_to_the_moon.mp3")
+                        .title(new SongTitle("Crystallized"))
+                        .artist(new SongArtist("Camellia"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743623166/songs/songImages/1UxQI259ivOy-I4bI8byDc3E5syt_ecNY/avatar.jpg")
+                        .fileSongId("1UxQI259ivOy-I4bI8byDc3E5syt_ecNY")
                         .downloadable(true)
                         .build(),
 
                     Song.builder()
-                        .title(new SongTitle("Rolling in the Deep"))
-                        .artist(new SongArtist("Adele"))
-                        .songImage("rolling_in_the_deep.jpg")
-                        .fileSongId("https://example.com/rolling_in_the_deep.mp3")
-                        .downloadable(false)
-                        .build(),
-
-                    Song.builder()
-                        .title(new SongTitle("Viva La Vida"))
-                        .artist(new SongArtist("Coldplay"))
-                        .songImage("viva_la_vida.jpg")
-                        .fileSongId("https://example.com/viva_la_vida.mp3")
+                        .title(new SongTitle("Finorza"))
+                        .artist(new SongArtist("Camellia feat Nanahira"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743623434/songs/songImages/1o3KgSQmpWPfMl0FBStJfxPomfhDC2U0d/avatar.jpg")
+                        .fileSongId("1o3KgSQmpWPfMl0FBStJfxPomfhDC2U0d")
                         .downloadable(true)
                         .build(),
 
                     Song.builder()
-                        .title(new SongTitle("Shape of You"))
-                        .artist(new SongArtist("Ed Sheeran"))
-                        .songImage("shape_of_you.jpg")
-                        .fileSongId("https://example.com/shape_of_you.mp3")
+                        .title(new SongTitle("Louder than steel"))
+                        .artist(new SongArtist("Ryu-5150"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743623861/songs/songImages/1PjZsxEx-K6qVXZn6IYkqHI2u1wVqebyE/avatar.jpg")
+                        .fileSongId("1PjZsxEx-K6qVXZn6IYkqHI2u1wVqebyE")
+                        .downloadable(true)
+                        .build(),
+
+                    Song.builder()
+                        .title(new SongTitle("Death Piano"))
+                        .artist(new SongArtist("Xi"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743624220/songs/songImages/1ja7ZEp6lFlBqCVJZXefLfg_bhp6Yuv12/avatar.jpg")
+                        .fileSongId("1ja7ZEp6lFlBqCVJZXefLfg_bhp6Yuv12")
+                        .downloadable(true)
+                        .build(),
+
+                    Song.builder()
+                        .title(new SongTitle("Blue Zenith"))
+                        .artist(new SongArtist("Xi"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743624434/songs/songImages/16hV7O4FAV3a_SzSlSliWJobNmHU5KoVP/avatar.jpg")
+                        .fileSongId("16hV7O4FAV3a_SzSlSliWJobNmHU5KoVP")
+                        .downloadable(true)
+                        .build(),
+
+                    Song.builder()
+                        .title(new SongTitle("Yue"))
+                        .artist(new SongArtist("Kozato"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743624773/songs/songImages/1iD54YSKe4Rr23HaKpIIeLQboL38qNIOy/avatar.jpg")
+                        .fileSongId("1iD54YSKe4Rr23HaKpIIeLQboL38qNIOy")
                         .downloadable(true)
                         .build()
                 );

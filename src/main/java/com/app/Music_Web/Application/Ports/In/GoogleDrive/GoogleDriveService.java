@@ -1,6 +1,7 @@
 package com.app.Music_Web.Application.Ports.In.GoogleDrive;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface GoogleDriveService {
     String getAccessToken()throws IOException;
@@ -11,4 +12,5 @@ public interface GoogleDriveService {
     void deleteFile(String accessToken,String fileId);
     byte[] downloadFile(String accessToken,String fileId);
     String getFileName(String accessToken, String fileId);
+    InputStream getFileStream(String accessToken, String fileId) throws IOException;
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import com.app.Music_Web.Domain.Entities.Genre;
 import com.app.Music_Web.Domain.ValueObjects.Genre.GenreName;
@@ -14,6 +15,7 @@ import com.app.Music_Web.Infrastructure.Persistence.Repositories.GenreRepository
 @Configuration
 public class GenreSeeder {
     @Bean
+    @Order(1)
     CommandLineRunner seedGenres (GenreRepository genreRepository){
         return args ->{
             if (genreRepository.count() == 0) {

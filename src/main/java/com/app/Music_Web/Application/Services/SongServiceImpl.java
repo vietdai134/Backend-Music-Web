@@ -121,7 +121,7 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 throw new RuntimeException("Upload failed", e);
             }
         })
-        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742989033/songs/songImages/default/a669uahfutmmki9crcbt.jpg");
+        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg");
         
         List<Genre> genres= genreRepositoryPort.findByGenreNameIn(genreNames);
         System.out.println("genres: " + genres);
@@ -209,7 +209,6 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
             }
         })
         : CompletableFuture.completedFuture(song.getSongImage()); // Giữ nguyên ảnh cũ
-        // : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1742804273/users/userAvatars/default/sgsl4xyfmmsogrtozgmk.jpg");
 
         song.getSongGenres().clear();
 

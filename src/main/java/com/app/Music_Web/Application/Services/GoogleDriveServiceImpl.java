@@ -1,8 +1,15 @@
 package com.app.Music_Web.Application.Services;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 
 @Service
@@ -29,12 +37,14 @@ public class GoogleDriveServiceImpl implements GoogleDriveService{
     private final RestTemplate restTemplate;
     private static final String GOOGLE_DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files";
     private static final String UPLOAD_URL = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+    private final CloseableHttpClient httpClient;
 
     public GoogleDriveServiceImpl(
                 GoogleCredentials googleCredentials,
                 RestTemplate restTemplate){
         this.googleCredentials=googleCredentials;
         this.restTemplate=restTemplate;
+        this.httpClient = HttpClients.createDefault();
     }
 
     @PostConstruct
@@ -220,4 +230,36 @@ public class GoogleDriveServiceImpl implements GoogleDriveService{
     }
 
 
+    public InputStream getFileStream(String accessToken, String fileId) throws IOException {
+        String url = GOOGLE_DRIVE_FILES_URL + "/" + fileId + "?alt=media";
+        HttpGet request = new HttpGet(url);
+        request.setHeader("Authorization", "Bearer " + accessToken);
+
+        return httpClient.execute(request, response -> {
+            org.apache.hc.core5.http.HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                try (InputStream inputStream = entity.getContent()) {
+                    // Đọc toàn bộ dữ liệu vào ByteArrayOutputStream
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    byte[] data = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+                        buffer.write(data, 0, bytesRead);
+                    }
+                    buffer.flush();
+
+                    // Chuyển dữ liệu thành ByteArrayInputStream và trả về
+                    return new ByteArrayInputStream(buffer.toByteArray());
+                }
+            }
+            throw new IOException("Không thể lấy stream từ file: " + fileId);
+        });
+    }
+
+
+    // Đóng httpClient khi ứng dụng tắt (tùy chọn)
+    @PreDestroy
+    public void close() throws IOException {
+        httpClient.close();
+    }
 }

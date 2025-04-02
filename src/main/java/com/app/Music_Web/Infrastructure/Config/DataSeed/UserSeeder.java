@@ -19,7 +19,7 @@ import com.app.Music_Web.Infrastructure.Persistence.Repositories.UserRepository;
 @Configuration
 public class UserSeeder {
     @Bean
-    @Order(2)
+    @Order(1)
     CommandLineRunner seedUsers (UserRepository userRepository){
         return args -> {
             if(userRepository.count()==0){
@@ -31,6 +31,7 @@ public class UserSeeder {
                         .email(new UserEmail("vietnguyentran134@gmail.com"))
                         .password(new UserPassword(passwordEncoder.encode("123")))
                         .accountType(AccountType.ADMIN)
+                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg")
                         .createdDate(new Date())
                         .build(),
 
@@ -39,6 +40,7 @@ public class UserSeeder {
                         .email(new UserEmail("vntk134@gmail.com"))
                         .password(new UserPassword(passwordEncoder.encode("123")))
                         .accountType(AccountType.NORMAL)
+                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg")
                         .createdDate(new Date())
                         .build(),
                     
@@ -47,6 +49,7 @@ public class UserSeeder {
                         .email(new UserEmail("nguyentrandaiviet14112003@gmail.com"))
                         .password(new UserPassword(passwordEncoder.encode("123")))
                         .accountType(AccountType.PREMIUM)
+                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg")
                         .createdDate(new Date())
                         .build()
                     
