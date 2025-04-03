@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ import org.springframework.http.HttpHeaders;
 public class SongController {
     private final FindSongService findSongService;
     private final SaveSongService saveSongService;
-    private final DeleteSongService deleteSongService;
+    // private final DeleteSongService deleteSongService;
     private final UpdateSongService updateSongService;
     private final GoogleDriveService googleDriveService;
     private final SaveSongApprovalService saveSongApprovalService;
@@ -57,7 +58,7 @@ public class SongController {
                             FindGenreService findGenreService) {
         this.saveSongService = saveSongService;
         this.findSongService = findSongService;
-        this.deleteSongService=deleteSongService;
+        // this.deleteSongService=deleteSongService;
         this.updateSongService=updateSongService;
         this.googleDriveService=googleDriveService;
         this.saveSongApprovalService=saveSongApprovalService;
@@ -68,6 +69,7 @@ public class SongController {
 
     // Lấy danh sách file trên Google Drive
     @GetMapping("/files")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<String> listDriveFiles() throws IOException {
         String accessToken = googleDriveService.getAccessToken();
         String fileList = googleDriveService.listDriveFiles(accessToken);
@@ -87,6 +89,7 @@ public class SongController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Void> createSong(@ModelAttribute SongRequest request,
                                            @AuthenticationPrincipal UserDetails userDetails) throws Exception {
         String accessToken = googleDriveService.getAccessToken();
@@ -143,59 +146,9 @@ public class SongController {
     }
     
 
-    // @PostMapping
-    // public ResponseEntity<Void> createSong(@ModelAttribute SongRequest request,
-    //                                         @AuthenticationPrincipal UserDetails userDetails) throws Exception{
-    //     String accessToken=googleDriveService.getAccessToken();
-    //     byte[] songFileData= request.getSongFileData().getBytes();
-    //     String fileId = googleDriveService.uploadFile(songFileData
-    //                                     , request.getArtist()+"-"+request.getTitle()+".mp3", 
-    //                                     accessToken);
-                                        
-    //     saveSongService.saveSong(request.getTitle(),
-    //                             request.getArtist(),
-    //                             request.getSongImage(),
-    //                             fileId,
-    //                             request.getGenreNames(),
-    //                             request.isDownloadable());
-
-    //     Long songId= findSongService.findByFileSongId(fileId);
-    //     CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
-    //     Long userId=customUserDetails.getUserId();
-        
-    //     // Lưu vào song approval
-    //     ApprovalStatus status = ApprovalStatus.valueOf("APPROVED".toUpperCase());
-    //     saveSongApprovalService.saveSongApproval(songId, userId,status);
-
-    //     // Lưu vào song upload
-    //     saveSongUploadService.saveSongUpload(songId, userId);                                      
-
-        
-    //     return ResponseEntity.ok().build();
-    // }
-
-    // Cập nhật tên file
-    @PatchMapping("/files/{fileId}")
-    public ResponseEntity<String> updateFileName(
-            @PathVariable String fileId,
-            @RequestParam("newName") String newName) throws IOException {
-        String accessToken = googleDriveService.getAccessToken();
-        String updatedFileInfo = googleDriveService.updateFileName(accessToken, fileId, newName);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updatedFileInfo);
-    }
-
-    // Xóa file
-    @DeleteMapping("/files/{fileId}")
-    public ResponseEntity<Void> deleteFile(@PathVariable String fileId) throws IOException {
-        String accessToken = googleDriveService.getAccessToken();
-        googleDriveService.deleteFile(accessToken, fileId);
-        return ResponseEntity.noContent().build();
-    }
-
     // Tải file về
-    @GetMapping("/files/{fileId}/download")
+    @GetMapping("/download/{fileId}")
+    @PreAuthorize("hasAuthority('DOWNLOAD_SONG')")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable String fileId) throws IOException {
         String accessToken = googleDriveService.getAccessToken();
         byte[] fileData = googleDriveService.downloadFile(accessToken, fileId);
@@ -287,13 +240,15 @@ public class SongController {
                 .build());
     }
 
-    @DeleteMapping("/{songId}")
-    public ResponseEntity<Void> deleteGenre(@PathVariable Long songId){
-        deleteSongService.deleteSong(songId);
-        return ResponseEntity.noContent().build();
-    }
+    // @DeleteMapping("/{songId}")
+    // @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
+    // public ResponseEntity<Void> deleteGenre(@PathVariable Long songId){
+    //     deleteSongService.deleteSong(songId);
+    //     return ResponseEntity.noContent().build();
+    // }
 
     @PutMapping(value = "/update/{songId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('EDIT_SONG')")
     public ResponseEntity<Void> updateSong(
             @PathVariable Long songId,
             @ModelAttribute SongUpdateRequest request) throws Exception {

@@ -1,6 +1,7 @@
 package com.app.Music_Web.API.Controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ public class SongApprovalController {
     }
 
     @PutMapping("/{songId}")
+    @PreAuthorize("hasAuthority('MODERATE_SONG')")
     public ResponseEntity<Void> changeStatusSong(
         @PathVariable Long songId,
         @RequestParam ApprovalStatus approvalStatus
@@ -31,6 +33,7 @@ public class SongApprovalController {
     }
 
     @PutMapping("upload-song/{uploadId}")
+    @PreAuthorize("hasAuthority('MODERATE_SONG')")
     public ResponseEntity<Void> changeStatusUploadSong(
         @PathVariable Long uploadId,
         @RequestParam ApprovalStatus approvalStatus

@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -99,6 +100,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Page<UserResponse>> getAllUsers(@RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size,Sort.unsorted());
@@ -116,6 +118,7 @@ public class UserController {
     }
 
     @DeleteMapping("delete/{userId}")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) throws Exception{
         deleteUserService.deleteUser(userId);
         return ResponseEntity.noContent().build();
@@ -123,6 +126,7 @@ public class UserController {
 
     //tìm kiếm gần đúng với phân trang
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Page<UserResponse>> searchUsersFuzzy(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -143,6 +147,7 @@ public class UserController {
 
 
     @GetMapping("/{userId}")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId){
         UserDTO user= findUserService.findUserById(userId);
         UserResponse userResponse= UserResponse.builder()
@@ -157,6 +162,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/update/{userId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Void> updateUser(
             @PathVariable Long userId,
             // @RequestBody UserUpdateRequest request) throws Exception{

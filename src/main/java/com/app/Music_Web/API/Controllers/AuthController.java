@@ -58,34 +58,6 @@ public class AuthController {
                             // .build();
     }
 
-//     @PostMapping("/logout")
-//     public ResponseEntity<Map<String, String>> logout() {
-//         // Tạo cookie với giá trị rỗng và maxAge = 0 để xóa cookie
-//         ResponseCookie deleteAccessCookie = ResponseCookie.from("accessToken", "")
-//                 .httpOnly(true)
-//                 .secure(true)
-//                 .path("/")
-//                 .maxAge(0) // Xóa cookie ngay lập tức
-//                 .sameSite("Strict")
-//                 .build();
-
-//         ResponseCookie deleteRefreshCookie = ResponseCookie.from("refreshToken", "")
-//                 .httpOnly(true)
-//                 .secure(true)
-//                 .path("/")
-//                 .maxAge(0) // Xóa cookie ngay lập tức
-//                 .sameSite("Strict")
-//                 .build();
-
-//         Map<String, String> responseBody = new HashMap<>();
-//         responseBody.put("message", "Logout successful");
-
-//         return ResponseEntity.ok()
-//                 .header(HttpHeaders.SET_COOKIE, deleteAccessCookie.toString())
-//                 .header(HttpHeaders.SET_COOKIE, deleteRefreshCookie.toString())
-//                 .body(responseBody);
-//     }
-
         @PostMapping("/logout")
         public ResponseEntity<Map<String, String>> logout() {
         Map<String, String> responseBody = new HashMap<>();
@@ -93,35 +65,6 @@ public class AuthController {
         return ResponseEntity.ok(responseBody);
         }
 
-//     @PostMapping("/refresh")
-//     public ResponseEntity<Map<String, String>> refreshToken(@CookieValue("refreshToken") String refreshToken) {
-//         UserAuthDTO authDTO = authService.refreshAccessToken(refreshToken);
-
-//         ResponseCookie accessCookie = ResponseCookie.from("accessToken", authDTO.getAccessToken())
-//                 .httpOnly(true)
-//                 .secure(true)
-//                 .path("/")
-//                 // .maxAge(Duration.ofHours(1)) // Access token mới sống 1 giờ
-//                 .maxAge(Duration.ofMinutes(1))
-//                 .sameSite("Strict")
-//                 .build();
-//         // Gia hạn refreshToken trong cookie
-//         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", authDTO.getRefreshToken())
-//                 .httpOnly(true)
-//                 .secure(true)
-//                 .path("/")
-//                 .maxAge(Duration.ofMinutes(1)) // Gia hạn thêm 1 phút
-//                 .sameSite("Strict")
-//                 .build();
-
-//         Map<String, String> responseBody = new HashMap<>();
-//         responseBody.put("message", "Token refreshed");
-
-//         return ResponseEntity.ok()
-//                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
-//                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-//                 .body(responseBody);
-//     }
         @PostMapping("/refresh")
         public ResponseEntity<Map<String, String>> refreshToken(@CookieValue("refreshToken") String refreshToken) {
         UserAuthDTO authDTO = authService.refreshAccessToken(refreshToken);

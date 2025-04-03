@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +45,7 @@ public class GenreController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Page<GenreResponse>> getAllGenres(@RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size,Sort.unsorted());
@@ -72,6 +74,7 @@ public class GenreController {
     }
 
     @GetMapping("/{genreId}")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<GenreResponse> getGenreById(@PathVariable Long genreId){
         GenreDTO genre= findGenreService.findByGenreId(genreId);
         GenreResponse genreResponse= GenreResponse.builder()
@@ -81,28 +84,15 @@ public class GenreController {
         return ResponseEntity.ok(genreResponse);
     }
 
-    // @GetMapping("/search")
-    // public ResponseEntity<?> getGenreByName(@RequestParam String genreName) {
-    //     GenreDTO genre = findGenreService.findByGenreName(genreName);
-    //     if (genre == null) {
-    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Genre not found");
-    //     }
-
-    //     GenreResponse response = GenreResponse.builder()
-    //             .genreId(genre.getGenreId())
-    //             .genreName(genre.getGenreName())
-    //             .build();
-
-    //     return ResponseEntity.ok(response);
-    // }
-
     @DeleteMapping("/{genreId}")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Void> deleteGenre(@PathVariable Long genreId){
         deleteGenreService.deleteGenre(genreId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<GenreResponse> createGenre(@RequestBody GenreRequest request) {
         GenreDTO savedGenre = saveGenreService.saveGenre(request.getGenreName());
 
@@ -115,6 +105,7 @@ public class GenreController {
     }
 
     @PutMapping("/update/{genreId}")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Void> updateGenre(
             @PathVariable Long genreId,
             @RequestBody GenreRequest request) {
@@ -125,6 +116,7 @@ public class GenreController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Page<GenreResponse>> searchGenresFuzzy(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
