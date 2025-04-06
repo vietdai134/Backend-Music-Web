@@ -11,6 +11,8 @@ public interface SongRepositoryPort {
     Page<Object[]> findAllWithStatus(ApprovalStatus status, Pageable pageable);
     Page<Object[]> searchByTitleOrArtist(String keyword, ApprovalStatus status, Pageable pageable);
 
+    Page<Object[]> findAllSongWithApproved(Pageable pageable);
+
     Song save(Song song);
     void delete(Song song);
     Song findByTitle_Title(String songTitle);
@@ -18,4 +20,8 @@ public interface SongRepositoryPort {
     Song findBySongId(Long songId);
 
     Song findByFileSongId(String fileSongId);
+
+    Long findByUploadId(Long uploadId);
+    Object findSongWithApproved(Long songId);
+
 }

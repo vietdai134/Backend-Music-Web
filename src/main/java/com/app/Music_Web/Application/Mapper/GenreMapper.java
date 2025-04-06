@@ -12,6 +12,12 @@ public class GenreMapper {
             .build();
     }
 
+    public static GenreDTO toDTO(String genreName) {
+        return GenreDTO.builder()
+            .genreName(genreName) // Chỉ có genreName, genreId để null
+            .build();
+    }
+    
     public static Genre toEntity(GenreDTO dto) {
         return Genre.builder()
             .genreId(dto.getGenreId())

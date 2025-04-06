@@ -12,6 +12,7 @@ import com.app.Music_Web.Domain.ValueObjects.Song.SongArtist;
 import com.app.Music_Web.Domain.ValueObjects.Song.SongTitle;
 import com.app.Music_Web.Application.DTO.GenreDTO;
 import com.app.Music_Web.Application.DTO.SongDTO;
+import com.app.Music_Web.Application.DTO.SongRedisDTO;
 import com.app.Music_Web.Application.Mapper.GenreMapper;
 import com.app.Music_Web.Application.Mapper.SongMapper;
 import com.app.Music_Web.Application.Ports.In.Cloudinary.CloudinaryService;
@@ -264,6 +265,32 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                     Collections.emptyList()))
                 .build();
         });
+    }
+
+    @Override
+    public SongRedisDTO findSongWithApproved(Long songId) {
+        Object resultRaw = songRepositoryPort.findSongWithApproved(songId);
+        Object[] result = (Object[]) resultRaw;
+        return SongRedisDTO.builder()
+                .songId(((Number) result[0]).longValue())
+                .title((String) result[1])
+                .artist((String) result[2])
+                .songImage((String) result[3])
+                .fileSongId((String) result[4])
+                .downloadable((Boolean) result[5])
+                .uploadDate((Date) result[6])
+                .userName((String) result[7])
+                .genresName((String)result[8])
+                .build();
+    }
+
+    @Override
+    public Long findByUploadId(Long uploadId) {
+        Long songId = songRepositoryPort.findByUploadId(uploadId);
+        if (songId == null) {
+            throw new RuntimeException("Song not found for upload ID: " + uploadId);
+        }
+        return songId;
     }
  
 }

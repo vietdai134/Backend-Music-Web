@@ -94,6 +94,7 @@ public class UserController {
             .email(user.getEmail()) // Trả về cả email
             .accountType(user.getAccountType().toString())
             .permissions(permissions)
+            .avatar(user.getUserAvatar())
             .build();
 
         return ResponseEntity.ok(userResponse);

@@ -7,6 +7,8 @@ import com.app.Music_Web.Application.DTO.GenreDTO;
 import com.app.Music_Web.Application.DTO.SongDTO;
 import com.app.Music_Web.Application.Ports.In.Genre.FindGenreService;
 import com.app.Music_Web.Application.Ports.In.GoogleDrive.GoogleDriveService;
+import com.app.Music_Web.Application.Ports.In.Redis.RedisSaveService;
+import com.app.Music_Web.Application.Ports.In.Redis.RedisUpdateService;
 import com.app.Music_Web.Application.Ports.In.Song.DeleteSongService;
 import com.app.Music_Web.Application.Ports.In.Song.FindSongService;
 import com.app.Music_Web.Application.Ports.In.Song.SaveSongService;
@@ -47,7 +49,8 @@ public class SongController {
     private final SaveSongApprovalService saveSongApprovalService;
     private final SaveSongUploadService saveSongUploadService;
     private final FindGenreService findGenreService;
-
+    private final RedisSaveService redisSaveService;
+    private final RedisUpdateService redisUpdateService;
     public SongController(FindSongService findSongService, 
                             SaveSongService saveSongService,
                             DeleteSongService deleteSongService,
@@ -55,7 +58,10 @@ public class SongController {
                             GoogleDriveService googleDriveService,
                             SaveSongApprovalService saveSongApprovalService,
                             SaveSongUploadService saveSongUploadService,
-                            FindGenreService findGenreService) {
+                            FindGenreService findGenreService,
+                            RedisSaveService redisSaveService,
+                            RedisUpdateService redisUpdateService) {
+        this.redisUpdateService=redisUpdateService;
         this.saveSongService = saveSongService;
         this.findSongService = findSongService;
         // this.deleteSongService=deleteSongService;
@@ -64,6 +70,7 @@ public class SongController {
         this.saveSongApprovalService=saveSongApprovalService;
         this.saveSongUploadService=saveSongUploadService;
         this.findGenreService=findGenreService;
+        this.redisSaveService=redisSaveService;
     }
 
 
@@ -114,6 +121,7 @@ public class SongController {
                             request.getGenreNames(),
                             request.isDownloadable()
                         );
+                        
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -137,11 +145,12 @@ public class SongController {
     
             // Đợi cả hai tác vụ hoàn tất
             CompletableFuture.allOf(saveApprovalFuture, saveUploadFuture).join();
+
+            redisSaveService.syncAddSong(songId);
         });
     
         // Đợi tất cả hoàn thành trước khi trả về response
         finalFuture.join();
-    
         return ResponseEntity.ok().build();
     }
     
@@ -168,6 +177,7 @@ public class SongController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public Page<SongResponse> getAllSongs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -266,6 +276,7 @@ public class SongController {
                 request.getSongImage(),
                 request.getGenreNames(),
                 request.isDownloadable());
+        redisUpdateService.syncUpdateSong(songId);
         return ResponseEntity.ok().build();
     }
 
