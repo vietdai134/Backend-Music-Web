@@ -42,17 +42,17 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
 
     public void createIndex() {
         try {
+            try {
+                jedis.ftInfo("songIdx");
+                return; // Index đã tồn tại
+            } catch (Exception ex) {
+                // Nếu lỗi là index chưa tồn tại thì tiếp tục tạo index
+                System.out.println("Index chưa tồn tại, tiếp tục tạo...");
+            }
+
             // Define the schema
-            // Schema schema = new Schema()
-            //     .addSortableTextField("title", 1.0)
-            //     .addSortableTextField("artist", 1.0)
-            //     .addTagField("genre", ",")
-            //     .addSortableTextField("uploadDate", 1.0)
-            //     .addTagField("downloadable");
-            //     // .addTextField("songImage", 1.0)     // Thêm nếu cần tìm kiếm
-            //     // .addTextField("fileSongId", 1.0)    // Thêm nếu cần tìm kiếm
-            //     .addTextField("userName", 1.0); // Thêm nếu cần tìm kiếm
             Schema schema = new Schema()
+                    .addTagField("songId")
                     .addSortableTextField("title", 1.0)
                     .addSortableTextField("artist", 1.0)
                     .addTagField("genre", ",")
@@ -69,6 +69,7 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
 
             // Create the index
             jedis.ftCreate("songIdx", options, schema);
+            System.out.println("Index đã được tạo thành công.");
         } catch (Exception e) {
             System.out.println("Index already exists or error: " + e.getMessage());
         }
@@ -100,7 +101,7 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
         //         "userName", userName
         // ));
         Map<String, String> map = new HashMap<>();
-
+        if(id != null) map.put("songId", id);
         if (title != null) map.put("title", title);
         if (artist != null) map.put("artist", artist);
         if (genre != null) map.put("genre", genre);
@@ -114,11 +115,19 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
     }
 
     @Override
-    public Page<SongRedisDTO> searchSongs(String title, String artist, 
+    public Page<SongRedisDTO> searchSongs(List<String> songIds,String title, String artist, 
                 List<String> genres, String username, Pageable pageable) {
         try {
             StringBuilder queryBuilder = new StringBuilder();
+            if (songIds != null && !songIds.isEmpty()) {
+                String query = songIds.stream()
+                                .map(id -> id) // Nếu cần escape thì xử lý ở đây
+                                .collect(Collectors.joining("|"));
 
+                String redisquery = String.format("@songId:{%s}", query);
+                queryBuilder.append(redisquery).append(" ");
+            }
+            
             if (title != null && !title.isEmpty()) {
                 queryBuilder.append("@title:(").append(title).append(") ");
             }
@@ -178,69 +187,6 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         }
     }
-
-    // @Override
-    // public List<SongRedisDTO> searchSongs(String title, String artist, List<String> genres, String username,
-    //                             int offset, int limit,String sortBy, String sortDirection) {
-    //     try {
-    //         StringBuilder queryBuilder = new StringBuilder();
-
-    //         if (title != null && !title.isEmpty()) {
-    //             queryBuilder.append("@title:(").append(title).append(") ");
-    //         }
-
-    //         if (artist != null && !artist.isEmpty()) {
-    //             queryBuilder.append("@artist:(").append(artist).append(") ");
-    //         }
-
-    //         if (genres != null && !genres.isEmpty()) {
-    //             // Tag fields phải dùng dấu | để OR, còn muốn AND thì dùng từng cái một như @genre:{A} @genre:{B}
-    //             for (String genre : genres) {
-    //                 queryBuilder.append("@genre:{").append(genre).append("} ");
-    //             }
-    //         }
-
-    //         if (username != null && !username.isEmpty()) {
-    //             queryBuilder.append("@userName:(").append(username).append(") ");
-    //         }
-
-    //         Query query = new Query(queryBuilder.toString().trim())
-    //                 .limit(offset, limit);
-
-    //         if (sortBy != null && !sortBy.isEmpty()) {
-    //             boolean asc = sortDirection == null || sortDirection.equalsIgnoreCase("asc");
-    //             query.setSortBy(sortBy, asc);
-    //         }
-
-    //         SearchResult results = jedis.ftSearch("songIdx", query);
-    //         List<SongRedisDTO> songs = new ArrayList<>();
-
-    //         for (Document doc : results.getDocuments()) {
-    //             Map<String, Object> props = StreamSupport.stream(doc.getProperties().spliterator(), false)
-    //                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-    //             String genreString = props.getOrDefault("genre", "").toString();
-    //             songs.add(SongRedisDTO.builder()
-    //                 .songId(Long.valueOf(doc.getId().replace("song:", "")))
-    //                 .title((String) props.get("title"))
-    //                 .artist((String) props.get("artist"))
-    //                 .songImage((String) props.get("songImage"))
-    //                 .fileSongId((String) props.get("fileSongId"))
-    //                 .downloadable(Boolean.parseBoolean((String) props.get("downloadable")))
-    //                 .uploadDate(new Date()) // Optional: parse lại nếu cần thiết
-    //                 .userName((String) props.get("userName"))
-    //                 .genresName(genreString)
-
-    //                 .build());
-    //         }
-
-    //         return songs;
-
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         return new ArrayList<>();
-    //     }
-    // }
 
     @Override
     public void updateSong(String id, String title, String artist, String genre, String uploadDate, boolean downloadable,

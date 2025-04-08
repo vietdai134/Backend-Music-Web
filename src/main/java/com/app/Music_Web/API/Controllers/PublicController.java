@@ -81,6 +81,7 @@ public class PublicController {
 
     @GetMapping("/songs/search")
     public Page<SongRedisDTO> search(
+            @RequestParam(required = false) List<String> songIds,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String artist,
             @RequestParam(required = false) List<String> genres,
@@ -98,6 +99,6 @@ public class PublicController {
         }
 
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return redisSearchService.searchSongs(title, artist, genres, username, pageable);
+        return redisSearchService.searchSongs(songIds,title, artist, genres, username, pageable);
     }
 }

@@ -15,7 +15,7 @@ public interface RedisSearchService {
     //                         int offset, int limit,String sortBy, String sortDirection);
 
     
-    Page<SongRedisDTO> searchSongs(String title, String artist, 
+    Page<SongRedisDTO> searchSongs(List<String> songId,String title, String artist, 
                 List<String> genres, String username, Pageable pageable);
     
 } 

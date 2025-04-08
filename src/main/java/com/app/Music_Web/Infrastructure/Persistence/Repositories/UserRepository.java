@@ -5,12 +5,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
 import com.app.Music_Web.Domain.Entities.User;
 
-@Repository
 public interface UserRepository extends JpaRepository<User,Long>,UserRepositoryPort {
     @Override
     @Query("SELECT DISTINCT u FROM User u " +
