@@ -1,11 +1,15 @@
 package com.app.Music_Web.Application.Services;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.app.Music_Web.Application.DTO.ListenHistoryDTO;
+import com.app.Music_Web.Application.Mapper.ListenHistoryMapper;
 import com.app.Music_Web.Application.Ports.In.ListenHistory.DeleteListenHistoryService;
+import com.app.Music_Web.Application.Ports.In.ListenHistory.FindListenHistoryService;
 import com.app.Music_Web.Application.Ports.In.ListenHistory.SaveListenHistoryService;
 import com.app.Music_Web.Application.Ports.Out.ListenHistoryRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.SongRepositoryPort;
@@ -18,7 +22,8 @@ import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 
 @Service
 public class ListenHistoryServiceImpl implements SaveListenHistoryService,
-                                                    DeleteListenHistoryService {       
+                                                    DeleteListenHistoryService,
+                                                    FindListenHistoryService {       
     private final ListenHistoryRepositoryPort listenHistoryRepositoryPort;
     private final SongRepositoryPort songRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
@@ -55,6 +60,29 @@ public class ListenHistoryServiceImpl implements SaveListenHistoryService,
         UserEmail userEmail = new UserEmail(email);
         User user = userRepositoryPort.findByEmail(userEmail);
         listenHistoryRepositoryPort.deleteBySong_SongIdAndUser_UserId(songId, user.getUserId());
+    }
+
+
+    @Override
+    public List<ListenHistoryDTO> findListenHistoryByUser(String email) {
+        UserEmail userEmail = new UserEmail(email);
+        User user = userRepositoryPort.findByEmail(userEmail);
+        List<ListenHistory> listenHistories= listenHistoryRepositoryPort.findAllByUser_UserId(user.getUserId());
+        if(listenHistories.isEmpty()){
+            return null;
+        }
+        // List<ListenHistoryDTO> listenHistoryDTOs = listenHistories.stream()
+        //     .map(listenHitory -> ListenHistoryDTO.builder()
+        //                         .historyId(listenHitory.getHistoryId())
+        //                         .listenedDate(listenHitory.getListenedDate())
+        //                         .songId(listenHitory.getSong().getSongId())
+        //                         .userId(listenHitory.getUser().getUserId())
+        //                         .build()).toList();
+        // return listenHistoryDTOs;
+        return listenHistories.stream()
+            .map(ListenHistoryMapper::toListenHistoryDTO)
+            .toList();
+        
     }
 
 }

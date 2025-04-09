@@ -14,29 +14,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.Music_Web.Application.DTO.ListenHistoryDTO;
-import com.app.Music_Web.Application.Ports.In.ListenHistory.DeleteListenHistoryService;
-import com.app.Music_Web.Application.Ports.In.ListenHistory.FindListenHistoryService;
-import com.app.Music_Web.Application.Ports.In.ListenHistory.SaveListenHistoryService;
+import com.app.Music_Web.Application.DTO.LikedSongDTO;
+import com.app.Music_Web.Application.Ports.In.LikedSong.DeleteLikedSongService;
+import com.app.Music_Web.Application.Ports.In.LikedSong.FindLikedSongService;
+import com.app.Music_Web.Application.Ports.In.LikedSong.SaveLikedSongService;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
 
 @RestController
-@RequestMapping("/api/listen-history")
-public class ListenHistoryController {
-    private final SaveListenHistoryService saveListenHistoryService;
-    private final DeleteListenHistoryService deleteListenHistoryService;
-    private final FindListenHistoryService findListenHistoryService;
-    public ListenHistoryController(SaveListenHistoryService saveListenHistoryService,
-                                    DeleteListenHistoryService deleteListenHistoryService,
-                                    FindListenHistoryService findListenHistoryService) {
-        this.findListenHistoryService = findListenHistoryService;
-        this.deleteListenHistoryService=deleteListenHistoryService;
-        this.saveListenHistoryService = saveListenHistoryService;
+@RequestMapping("/api/liked-song")
+public class LikedSongController {
+    private final SaveLikedSongService saveLikedSongService;
+    private final DeleteLikedSongService deleteLikedSongService;
+    private final FindLikedSongService findLikedSongService;
+    public LikedSongController(SaveLikedSongService saveLikedSongService,
+                                DeleteLikedSongService deleteLikedSongService,
+                                FindLikedSongService findLikedSongService) {
+        this.saveLikedSongService = saveLikedSongService;
+        this.deleteLikedSongService = deleteLikedSongService;
+        this.findLikedSongService = findLikedSongService;
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('HISTORY')")
-    public ResponseEntity<Void> saveListenHistory(@RequestParam Long songId, 
+    @PreAuthorize("hasAuthority('LIKE_SONG')")
+    public ResponseEntity<Void> saveLikedSong(@RequestParam Long songId, 
                                 @AuthenticationPrincipal UserDetails userDetails) {
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         if (userDetails == null) {
@@ -44,13 +44,13 @@ public class ListenHistoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String email= customUserDetails.getEmail();
-        saveListenHistoryService.saveListenHistory(songId, email);
+        saveLikedSongService.saveLikedSong(songId, email);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    @PreAuthorize("hasAuthority('HISTORY')")
-    public ResponseEntity<Void> deleteSongFromListenHistory(@RequestParam Long songId, 
+    @PreAuthorize("hasAuthority('LIKE_SONG')")
+    public ResponseEntity<Void> deleteLikedSong(@RequestParam Long songId, 
                                 @AuthenticationPrincipal UserDetails userDetails) {
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         if (userDetails == null) {
@@ -58,13 +58,13 @@ public class ListenHistoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String email= customUserDetails.getEmail();
-        deleteListenHistoryService.deleteSongFromListenHistory(songId, email);
+        deleteLikedSongService.deleteLikedSong(songId, email);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('HISTORY')")
-    public ResponseEntity<List<ListenHistoryDTO>> getListenHistory(
+    @PreAuthorize("hasAuthority('LIKE_SONG')")
+    public ResponseEntity<List<LikedSongDTO>> getLikedSong(
         @AuthenticationPrincipal UserDetails userDetails) {
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         if (userDetails == null) {
@@ -72,7 +72,7 @@ public class ListenHistoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String email= customUserDetails.getEmail();
-        List<ListenHistoryDTO> listenHistory = findListenHistoryService.findListenHistoryByUser(email);
-        return ResponseEntity.ok(listenHistory);
+        List<LikedSongDTO> likedSongs = findLikedSongService.findLikedSongsByUser(email);
+        return ResponseEntity.ok(likedSongs);
     }
 }
