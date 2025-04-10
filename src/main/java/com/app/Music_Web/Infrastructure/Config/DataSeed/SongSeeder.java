@@ -29,7 +29,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Polyphia"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621896/songs/songImages/1UCICxA-4QVAz_OmZxVJwmVUR4L-ogev8/avatar.jpg")
                         .fileSongId("1UCICxA-4QVAz_OmZxVJwmVUR4L-ogev8")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -37,7 +37,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Polyphia"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743622134/songs/songImages/1JPdDiXH_rXMdQnE0nkv4EekkyLaMKSJX/avatar.jpg")
                         .fileSongId("1JPdDiXH_rXMdQnE0nkv4EekkyLaMKSJX")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -45,7 +45,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Polyphia"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743622620/songs/songImages/16dXr0iN15P2h2Gis9zvafMuuplYCkY5w/avatar.jpg")
                         .fileSongId("16dXr0iN15P2h2Gis9zvafMuuplYCkY5w")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -53,7 +53,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Polyphia"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743622876/songs/songImages/1aTGJjopIryBkdTa-4pFPBtNyMQOatcXV/avatar.jpg")
                         .fileSongId("1aTGJjopIryBkdTa-4pFPBtNyMQOatcXV")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -61,7 +61,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Camellia"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743623166/songs/songImages/1UxQI259ivOy-I4bI8byDc3E5syt_ecNY/avatar.jpg")
                         .fileSongId("1UxQI259ivOy-I4bI8byDc3E5syt_ecNY")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -69,7 +69,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Camellia feat Nanahira"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743623434/songs/songImages/1o3KgSQmpWPfMl0FBStJfxPomfhDC2U0d/avatar.jpg")
                         .fileSongId("1o3KgSQmpWPfMl0FBStJfxPomfhDC2U0d")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -77,7 +77,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Ryu-5150"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743623861/songs/songImages/1PjZsxEx-K6qVXZn6IYkqHI2u1wVqebyE/avatar.jpg")
                         .fileSongId("1PjZsxEx-K6qVXZn6IYkqHI2u1wVqebyE")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -85,7 +85,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Xi"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743624220/songs/songImages/1ja7ZEp6lFlBqCVJZXefLfg_bhp6Yuv12/avatar.jpg")
                         .fileSongId("1ja7ZEp6lFlBqCVJZXefLfg_bhp6Yuv12")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -93,7 +93,7 @@ public class SongSeeder {
                         .artist(new SongArtist("Xi"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743624434/songs/songImages/16hV7O4FAV3a_SzSlSliWJobNmHU5KoVP/avatar.jpg")
                         .fileSongId("16hV7O4FAV3a_SzSlSliWJobNmHU5KoVP")
-                        .downloadable(true)
+                        // .downloadable(true)
                         .build(),
 
                     Song.builder()
@@ -101,12 +101,40 @@ public class SongSeeder {
                         .artist(new SongArtist("Kozato"))
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743624773/songs/songImages/1iD54YSKe4Rr23HaKpIIeLQboL38qNIOy/avatar.jpg")
                         .fileSongId("1iD54YSKe4Rr23HaKpIIeLQboL38qNIOy")
-                        .downloadable(true)
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Through The Fire And Flames"))
+                        .artist(new SongArtist("DragonForce"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743677471/songs/songImages/16dowjPJY58PvLCQKZe1JBhl_HAtBSMoR/avatar.jpg")
+                        .fileSongId("16dowjPJY58PvLCQKZe1JBhl_HAtBSMoR")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Running in the 90's"))
+                        .artist(new SongArtist("Initial D"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743969747/songs/songImages/11BdgVaLqxn1_SEJ22R9FQD2f6IXXOjQW/avatar.jpg")
+                        .fileSongId("11BdgVaLqxn1_SEJ22R9FQD2f6IXXOjQW")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Fury Of The Storm"))
+                        .artist(new SongArtist("Dragon Force"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743970131/songs/songImages/1iWf4EKcV3UzcPCPU40KPeodFeiVmx6Vw/avatar.jpg")
+                        .fileSongId("1iWf4EKcV3UzcPCPU40KPeodFeiVmx6Vw")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Arrival of Tears"))
+                        .artist(new SongArtist("Ayane"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743970615/songs/songImages/1bbihImLSBTE13ku6D0xeIxtlfsYRBCk_/avatar.jpg")
+                        .fileSongId("1bbihImLSBTE13ku6D0xeIxtlfsYRBCk_")
+                        // .downloadable(true)
                         .build()
                 );
 
                 songRepository.saveAll(songs);
-                System.out.println("Successfully seeded 10 songs into the database!");
+                System.out.println("Successfully seeded 14 songs into the database!");
             } else {
                 System.out.println("Songs table already contains data. Skipping seeding.");
             }

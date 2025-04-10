@@ -14,7 +14,7 @@ public class SongMapper {
             .artist(song.getArtist().getArtist())
             .songImage(song.getSongImage())
             .fileSongId(song.getFileSongId())
-            .downloadable(song.isDownloadable())
+            // .downloadable(song.isDownloadable())
             .genres(song.getSongGenres().stream()
                        .map(songGenre -> GenreDTO.builder()
                             .genreId(songGenre.getGenre().getGenreId())

@@ -18,7 +18,7 @@ public class SongResponse {
     private String artist;
     private String fileSongId;
     private String songImage;
-    private boolean downloadable;
+    // private boolean downloadable;
     private Date approvedDate;
     private String userName;
 

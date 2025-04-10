@@ -95,6 +95,13 @@ public class SongController {
                 .body(fileInfo);
     }
 
+    @DeleteMapping("/files/{fileId}")
+    public ResponseEntity<Void> deleteFile(@PathVariable String fileId) throws IOException {
+        String accessToken = googleDriveService.getAccessToken();
+        googleDriveService.deleteFile(accessToken, fileId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('SYSTEM_MANAGEMENT')")
     public ResponseEntity<Void> createSong(@ModelAttribute SongRequest request,
@@ -118,8 +125,8 @@ public class SongController {
                             request.getArtist(),
                             request.getSongImage(),
                             fileId,
-                            request.getGenreNames(),
-                            request.isDownloadable()
+                            request.getGenreNames()
+                            // request.isDownloadable()
                         );
                         
                     } catch (Exception e) {
@@ -200,7 +207,7 @@ public class SongController {
                 .songImage(song.getSongImage())
                 .genres(song.getGenres())
                 .approvedDate(song.getApprovedDate())
-                .downloadable(song.isDownloadable())
+                // .downloadable(song.isDownloadable())
                 .userName(song.getUserName())
                 .build());
     }
@@ -216,7 +223,7 @@ public class SongController {
                             .fileSongId(song.getFileSongId())
                             .songImage(song.getSongImage())
                             .genres(genres)
-                            .downloadable(song.isDownloadable())
+                            // .downloadable(song.isDownloadable())
                             .build();
         return ResponseEntity.ok(songResponse);
     }
@@ -245,7 +252,7 @@ public class SongController {
                 .songImage(song.getSongImage())
                 .genres(song.getGenres())
                 .approvedDate(song.getApprovedDate())
-                .downloadable(song.isDownloadable())
+                // .downloadable(song.isDownloadable())
                 .userName(song.getUserName())
                 .build());
     }
@@ -274,8 +281,8 @@ public class SongController {
                 request.getArtist(),
                 request.getSongFileId(),
                 request.getSongImage(),
-                request.getGenreNames(),
-                request.isDownloadable());
+                request.getGenreNames());
+                // request.isDownloadable());
         redisUpdateService.syncUpdateSong(songId);
         return ResponseEntity.ok().build();
     }

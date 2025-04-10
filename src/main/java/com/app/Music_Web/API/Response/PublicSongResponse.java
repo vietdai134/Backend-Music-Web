@@ -15,7 +15,7 @@ public class PublicSongResponse {
     private String artist;
     private String fileSongId;
     private String songImage;
-    private boolean downloadable;
+    // private boolean downloadable;
     private Date uploadDate;
     private String userName;
     private String genresName;

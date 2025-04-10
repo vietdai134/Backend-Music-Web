@@ -14,7 +14,7 @@ public class SongRedisDTO {
     private String artist;
     private String songImage;
     private String fileSongId;
-    private boolean downloadable;
+    // private boolean downloadable;
     private Date uploadDate;
     private String userName; 
     private String genresName;

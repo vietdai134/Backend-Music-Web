@@ -15,7 +15,7 @@ public class SongRequest {
     private String artist;
     private MultipartFile songImage;
     private MultipartFile songFileData;
-    private boolean downloadable;
+    // private boolean downloadable;
 
     private List<String> genreNames;
 
@@ -28,7 +28,7 @@ public class SongRequest {
         private String artist;
         private MultipartFile songImage;
         private String songFileId;
-        private boolean downloadable;
+        // private boolean downloadable;
     
         private List<String> genreNames;
     }

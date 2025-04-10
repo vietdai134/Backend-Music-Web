@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 public interface SongRepository extends JpaRepository<Song, Long>, SongRepositoryPort {
         @Override
         @Query("SELECT s.songId, s.title.title, s.artist.artist, "+
-                "s.songImage, s.fileSongId, s.downloadable, "+
+                "s.songImage, s.fileSongId, "+
                 "sa.approvedDate, u.userName.userName FROM Song s " +
                 "LEFT JOIN s.songApprovals sa " +
                 "LEFT JOIN sa.user u " +
@@ -22,7 +22,7 @@ public interface SongRepository extends JpaRepository<Song, Long>, SongRepositor
 
         @Override
         @Query("SELECT s.songId, s.title.title, s.artist.artist, "+
-                "s.songImage, s.fileSongId, s.downloadable, "+
+                "s.songImage, s.fileSongId, "+
                 "sa.approvedDate, u.userName.userName FROM Song s " +
                 "LEFT JOIN s.songApprovals sa " +
                 "LEFT JOIN sa.user u " +
@@ -35,7 +35,7 @@ public interface SongRepository extends JpaRepository<Song, Long>, SongRepositor
 
         @Override
         @Query(value = "select s.song_id, s.title as title, s.artist as artist, " + 
-                "s.song_image, s.file_song_id,s.downloadable, " + 
+                "s.song_image, s.file_song_id, " + 
                 "su.upload_date as uploadDate, u.user_name, group_concat(g.genre_name) genres " + 
                 "from song s " + 
                 "left join song_approval sa on s.song_id=sa.song_id " + 
@@ -45,13 +45,13 @@ public interface SongRepository extends JpaRepository<Song, Long>, SongRepositor
                 "left join genre g on sg.genre_id=g.genre_id " + 
                 "where sa.approval_status='APPROVED' " + 
                 "group by  s.song_id, s.title,s.artist, " + 
-                "s.song_image, s.file_song_id,s.downloadable, " + 
+                "s.song_image, s.file_song_id, " + 
                 "su.upload_date , u.user_name ", nativeQuery = true)
         Page<Object[]> findAllSongWithApproved(Pageable pageable);
 
         @Override
         @Query(value = "select s.song_id, s.title as title, s.artist as artist, " + 
-                "s.song_image, s.file_song_id,s.downloadable, " + 
+                "s.song_image, s.file_song_id, " + 
                 "su.upload_date as uploadDate, u.user_name, group_concat(g.genre_name) genres " + 
                 "from song s " + 
                 "left join song_approval sa on s.song_id=sa.song_id " + 
@@ -62,7 +62,7 @@ public interface SongRepository extends JpaRepository<Song, Long>, SongRepositor
                 "where sa.approval_status='APPROVED' " +
                 "AND s.song_id = :songId "+ 
                 "group by  s.song_id, s.title,s.artist, " + 
-                "s.song_image, s.file_song_id,s.downloadable, " + 
+                "s.song_image, s.file_song_id, " + 
                 "su.upload_date , u.user_name ", nativeQuery = true)
         Object findSongWithApproved(@Param("songId") Long songId);
 

@@ -36,4 +36,18 @@ public interface SongUploadRepository extends JpaRepository<SongUpload,Long>,Son
     Page<Object[]> searchUploadByTitleOrArtist(@Param("keyword") String keyword,
         @Param("status") ApprovalStatus status, Pageable pageable);
 
+
+        @Override
+        @Query(value ="SELECT s.song_id, s.title as title, s.artist as artist, "+
+                "s.song_image, su.upload_date as uploadDate "+
+                "FROM song_upload su "+
+                "INNER JOIN song s on s.song_id = su.song_id "+
+                "INNER JOIN song_approval sa on sa.song_id = su.song_id "+
+                "WHERE sa.approval_status= :approvalStatus "+
+                "AND su.uploaded_by= :userId ",nativeQuery = true)
+        Page<Object[]> findAllSongUploadWithApproveStatus(
+                @Param("approvalStatus") String approvalStatus,
+                @Param("userId") Long userId,
+                Pageable pageable);
+        
 }

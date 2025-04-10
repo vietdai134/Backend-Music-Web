@@ -31,7 +31,7 @@ public class PublicController {
     @GetMapping("/all")
     public Page<PublicSongResponse> getAllSongs(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadDate,desc") String sort) { 
         
         Sort sortOrder = Sort.unsorted(); // Mặc định không sắp xếp nếu không có tham số
@@ -57,27 +57,10 @@ public class PublicController {
                 // .genres(song.getGenres())
                 .genresName(song.getGenresName())
                 .uploadDate(song.getUploadDate())
-                .downloadable(song.isDownloadable())
+                // .downloadable(song.isDownloadable())
                 .userName(song.getUserName())
                 .build());
     }
-
-
-    // @GetMapping("/songs/search")
-    // public List<SongRedisDTO> search(
-    //         @RequestParam(required = false) String title,
-    //         @RequestParam(required = false) String artist,
-    //         @RequestParam(required = false) List<String> genres,
-    //         @RequestParam(required = false) String username,
-    //         @RequestParam(defaultValue = "0") int page,
-    //         @RequestParam(defaultValue = "10") int size,
-    //         @RequestParam(defaultValue = "uploadDate") String sortBy,
-    //         @RequestParam(defaultValue = "desc") String sortDirection) {
-
-    //     int offset = page * size;
-    //     return redisSearchService.searchSongs(title, artist, genres, username,
-    //                                     offset, size, sortBy, sortDirection);
-    // }
 
     @GetMapping("/songs/search")
     public Page<SongRedisDTO> search(
@@ -87,7 +70,7 @@ public class PublicController {
             @RequestParam(required = false) List<String> genres,
             @RequestParam(required = false) String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadDate,desc") String sort) { // Thay 4 tham số bằng Pageable
 
         Sort sortOrder = Sort.unsorted(); // Mặc định không sắp xếp nếu không có tham số

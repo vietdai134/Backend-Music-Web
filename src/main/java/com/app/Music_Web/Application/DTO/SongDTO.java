@@ -16,7 +16,7 @@ public class SongDTO {
     private String artist;
     private String songImage;
     private String fileSongId;
-    private boolean downloadable;
+    // private boolean downloadable;
     // private SongApprovalDTO songApprovalDTO;
     private Date approvedDate;
     private List<GenreDTO> genres;

@@ -13,4 +13,8 @@ public interface SongUploadRepositoryPort {
                                              Pageable pageable);
 
     SongUpload findByUploadId(Long uploadId);
+    Page<Object[]> findAllSongUploadWithApproveStatus(
+                String approvalStatus,
+                Long userId,
+                Pageable pageable);
 }

@@ -84,9 +84,9 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 .artist((String) row[2])
                 .songImage((String) row[3])
                 .fileSongId((String) row[4])
-                .downloadable((Boolean) row[5])
-                .approvedDate((Date) row[6])
-                .userName((String) row[7])
+                // .downloadable((Boolean) row[5])
+                .approvedDate((Date) row[5])
+                .userName((String) row[6])
                 .genres(genresBySongId.getOrDefault(
                     songId, 
                     Collections.emptyList()))
@@ -97,14 +97,15 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
 
     @Override
     public SongDTO saveSong(String title, String artist, MultipartFile songImage, 
-                    String fileSongId,List<String> genreNames ,
-                    boolean downloadable) throws Exception {
+                    String fileSongId,List<String> genreNames 
+                    // boolean downloadable
+                    ) throws Exception {
         Song song = Song.builder()
                         .title(new SongTitle(title))
                         .artist(new SongArtist(artist))
                         // .songImage(song_image)
                         .fileSongId(fileSongId)
-                        .downloadable(downloadable)
+                        // .downloadable(downloadable)
                         .build();
 
         // Khởi tạo songGenres nếu null
@@ -185,13 +186,14 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
 
     @Override
     public SongDTO updateSong(Long songId, String title, String artist,String fileSongId,
-                            MultipartFile songImg, List<String> genreNames,
-                            boolean downloadable) throws Exception {
+                            MultipartFile songImg, List<String> genreNames
+                            // boolean downloadable
+                            ) throws Exception {
         Song song = songRepositoryPort.findBySongId(songId);
 
         song.setTitle(new SongTitle(title));
         song.setArtist(new SongArtist(artist));
-        song.setDownloadable(downloadable);
+        // song.setDownloadable(downloadable);
 
         CompletableFuture<String> imgFuture = (songImg != null && !songImg.isEmpty())
         ? CompletableFuture.supplyAsync(() -> {
@@ -257,9 +259,9 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 .artist((String) row[2])
                 .songImage((String) row[3])
                 .fileSongId((String) row[4])
-                .downloadable((Boolean) row[5])
-                .approvedDate((Date) row[6])
-                .userName((String) row[7])
+                // .downloadable((Boolean) row[5])
+                .approvedDate((Date) row[5])
+                .userName((String) row[6])
                 .genres(genresBySongId.getOrDefault(
                     songId, 
                     Collections.emptyList()))
@@ -277,10 +279,10 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 .artist((String) result[2])
                 .songImage((String) result[3])
                 .fileSongId((String) result[4])
-                .downloadable((Boolean) result[5])
-                .uploadDate((Date) result[6])
-                .userName((String) result[7])
-                .genresName((String)result[8])
+                // .downloadable((Boolean) result[5])
+                .uploadDate((Date) result[5])
+                .userName((String) result[6])
+                .genresName((String)result[7])
                 .build();
     }
 

@@ -29,11 +29,11 @@ public class PublicServiceImpl implements FindService{
                 .artist((String) row[2])
                 .songImage((String) row[3])
                 .fileSongId((String) row[4])
-                .downloadable((Boolean) row[5])
-                .uploadDate((Date) row[6])
-                .userName((String) row[7])
+                // .downloadable((Boolean) row[5])
+                .uploadDate((Date) row[5])
+                .userName((String) row[6])
                 // .genres(new ArrayList<>(List.of(GenreDTO.builder().genreName((String) row[8]).build())))
-                .genresName((String)row[8])
+                .genresName((String)row[7])
                 .build();
         });
     }

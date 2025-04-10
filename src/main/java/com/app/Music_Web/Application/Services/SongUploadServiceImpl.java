@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.app.Music_Web.Application.DTO.SongDTO;
+import com.app.Music_Web.Application.DTO.SongRedisDTO;
 import com.app.Music_Web.Application.DTO.SongUploadDTO;
 import com.app.Music_Web.Application.Ports.In.SongUpload.FindSongUploadService;
 import com.app.Music_Web.Application.Ports.In.SongUpload.SaveSongUploadService;
@@ -18,6 +19,7 @@ import com.app.Music_Web.Domain.Entities.Song;
 import com.app.Music_Web.Domain.Entities.SongUpload;
 import com.app.Music_Web.Domain.Entities.User;
 import com.app.Music_Web.Domain.Enums.ApprovalStatus;
+import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 
 @Service
 public class SongUploadServiceImpl implements SaveSongUploadService, FindSongUploadService{
@@ -86,6 +88,19 @@ public class SongUploadServiceImpl implements SaveSongUploadService, FindSongUpl
         .userName((String) objects[6])        // u.userName.userName
         // .songId((Long) objects[7])            // s.songId
         // .uploadedBy((Long) objects[8])        // u.userId
+        .build());
+    }
+    @Override
+    public Page<SongRedisDTO> findAllSongUploadWithApproveStatus(ApprovalStatus approvalStatus, String email ,Pageable pageable) {
+        UserEmail userEmail = new UserEmail(email);
+        User user = userRepositoryPort.findByEmail(userEmail);
+       Page<Object[]> result= songUploadRepositoryPort.findAllSongUploadWithApproveStatus(approvalStatus.toString(),user.getUserId(),pageable);
+       return result.map(objects -> SongRedisDTO.builder()
+        .songId((Long) objects[0])        
+        .title((String) objects[1])       
+        .artist((String) objects[2])       
+        .songImage((String) objects[3])    
+        .uploadDate((Date) objects[4])     
         .build());
     }
     

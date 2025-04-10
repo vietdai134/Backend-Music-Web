@@ -46,8 +46,8 @@ public class Song {
     @Column(name="file_song_id",nullable = false)
     private String fileSongId;
 
-    @Column(name="downloadable",nullable = false)
-    private boolean downloadable;
+    // @Column(name="downloadable",nullable = false)
+    // private boolean downloadable;
 
     //liên kết 1-n với bảng SongUpload
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true )
