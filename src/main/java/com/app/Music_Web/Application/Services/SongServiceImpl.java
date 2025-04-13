@@ -283,6 +283,7 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 .uploadDate((Date) result[5])
                 .userName((String) result[6])
                 .genresName((String)result[7])
+                .albumNames((String) result[8])
                 .build();
     }
 

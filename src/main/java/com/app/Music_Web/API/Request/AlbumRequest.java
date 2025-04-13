@@ -1,5 +1,7 @@
 package com.app.Music_Web.API.Request;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.*;
 
 @Getter
@@ -8,6 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 public class AlbumRequest {
     private String albumName;
-    private String albumImage;
-    private Long userId;
+    private MultipartFile albumImage;
+
 }

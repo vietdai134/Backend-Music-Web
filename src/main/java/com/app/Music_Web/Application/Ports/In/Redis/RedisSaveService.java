@@ -4,7 +4,8 @@ public interface RedisSaveService {
     void addSong(String id, String title, String artist, 
         String genre, String uploadDate, 
         // boolean downloadable,
-        String songImage, String fileSongId, String userName);
+        String songImage, String fileSongId, String userName,
+        String albumName);
 
     void syncAddSong(Long songId);
 

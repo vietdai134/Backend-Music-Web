@@ -36,34 +36,44 @@ public interface SongRepository extends JpaRepository<Song, Long>, SongRepositor
         @Override
         @Query(value = "select s.song_id, s.title as title, s.artist as artist, " + 
                 "s.song_image, s.file_song_id, " + 
-                "su.upload_date as uploadDate, u.user_name, group_concat(g.genre_name) genres " + 
+                "su.upload_date as uploadDate, u.user_name, "+
+                "group_concat(distinct g.genre_name) genres, " + 
+                "group_concat(distinct a.album_name) albumNames "+
                 "from song s " + 
                 "left join song_approval sa on s.song_id=sa.song_id " + 
                 "left join song_upload su on s.song_id=su.song_id " + 
                 "left join user u on su.uploaded_by=u.user_id " + 
                 "left join song_genre sg on s.song_id=sg.song_id " + 
                 "left join genre g on sg.genre_id=g.genre_id " + 
+                "left join album_song als on als.song_id = s.song_id "+
+                "left join album a on a.album_id = als.album_id "+
                 "where sa.approval_status='APPROVED' " + 
                 "group by  s.song_id, s.title,s.artist, " + 
                 "s.song_image, s.file_song_id, " + 
-                "su.upload_date , u.user_name ", nativeQuery = true)
+                "su.upload_date , u.user_name "
+                , nativeQuery = true)
         Page<Object[]> findAllSongWithApproved(Pageable pageable);
 
         @Override
         @Query(value = "select s.song_id, s.title as title, s.artist as artist, " + 
                 "s.song_image, s.file_song_id, " + 
-                "su.upload_date as uploadDate, u.user_name, group_concat(g.genre_name) genres " + 
+                "su.upload_date as uploadDate, u.user_name, "+
+                "group_concat(g.genre_name) genres, " + 
+                "group_concat(distinct a.album_name) albumNames "+
                 "from song s " + 
                 "left join song_approval sa on s.song_id=sa.song_id " + 
                 "left join song_upload su on s.song_id=su.song_id " + 
                 "left join user u on su.uploaded_by=u.user_id " + 
                 "left join song_genre sg on s.song_id=sg.song_id " + 
                 "left join genre g on sg.genre_id=g.genre_id " + 
+                "left join album_song als on als.song_id = s.song_id "+
+                "left join album a on a.album_id = als.album_id "+
                 "where sa.approval_status='APPROVED' " +
                 "AND s.song_id = :songId "+ 
                 "group by  s.song_id, s.title,s.artist, " + 
                 "s.song_image, s.file_song_id, " + 
-                "su.upload_date , u.user_name ", nativeQuery = true)
+                "su.upload_date , u.user_name "
+                , nativeQuery = true)
         Object findSongWithApproved(@Param("songId") Long songId);
 
         @Override

@@ -1,10 +1,11 @@
 package com.app.Music_Web.Application.Ports.In.Album;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 import com.app.Music_Web.Application.DTO.AlbumDTO;
+import com.app.Music_Web.Application.DTO.AlbumSongDTO;
 
 public interface FindAlbumService {
-    Page<AlbumDTO> findByUser_UserId(Pageable pageable, Long userId);
+    List<AlbumDTO> findAlbumByUserId(Long userId);
+    List<AlbumSongDTO> findSongIdsByAlbumId(Long albumId);
 }

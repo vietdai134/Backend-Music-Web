@@ -40,14 +40,14 @@ public class SongApprovalController {
         @RequestParam ApprovalStatus approvalStatus
     ){
         updateSongApprovalService.changeStatusSong(songId, approvalStatus);
-        redisDeleteService.deleteSong(songId);
+        // redisDeleteService.deleteSong(songId);
         if(approvalStatus==ApprovalStatus.REVOKED){
             redisDeleteService.deleteSong(songId);
         }
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("upload-song/{uploadId}")
+    @PutMapping("/upload-song/{uploadId}")
     @PreAuthorize("hasAuthority('MODERATE_SONG')")
     public ResponseEntity<Void> changeStatusUploadSong(
         @PathVariable Long uploadId,

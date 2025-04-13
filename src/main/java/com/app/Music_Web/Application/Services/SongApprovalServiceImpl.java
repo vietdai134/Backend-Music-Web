@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.app.Music_Web.Application.DTO.SongApprovalDTO;
 import com.app.Music_Web.Application.Ports.In.SongApproval.SaveSongApprovalService;
 import com.app.Music_Web.Application.Ports.In.SongApproval.UpdateSongApprovalService;
+import com.app.Music_Web.Application.Ports.In.WebSocket.SendStatusService;
 import com.app.Music_Web.Application.Ports.Out.SongApprovalRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.SongRepositoryPort;
 import com.app.Music_Web.Application.Ports.Out.SongUploadRepositoryPort;
@@ -26,17 +27,20 @@ public class SongApprovalServiceImpl implements SaveSongApprovalService, UpdateS
     private final SongUploadRepositoryPort songUploadRepositoryPort;
     private final SongRepositoryPort songRepositoryPort;
     private final UserRepositoryPort userRepositoryPort;
+    private final SendStatusService sendStatusService;
 
     public SongApprovalServiceImpl(
         SongApprovalRepositoryPort songApprovalRepositoryPort,
         SongUploadRepositoryPort songUploadRepositoryPort,
         SongRepositoryPort songRepositoryPort,
-        UserRepositoryPort userRepositoryPort
+        UserRepositoryPort userRepositoryPort,
+        SendStatusService sendStatusService
     ){
         this.songApprovalRepositoryPort=songApprovalRepositoryPort;
         this.songUploadRepositoryPort=songUploadRepositoryPort;
         this.songRepositoryPort=songRepositoryPort;
         this.userRepositoryPort=userRepositoryPort;
+        this.sendStatusService=sendStatusService;
     }
 
     @Override
@@ -71,6 +75,9 @@ public class SongApprovalServiceImpl implements SaveSongApprovalService, UpdateS
     @Transactional
     public void changeStatusSong(Long songId, ApprovalStatus approvalStatus){
         songApprovalRepositoryPort.updateStatusSong(songId, approvalStatus);
+        if (approvalStatus == ApprovalStatus.REVOKED) {
+            sendStatusService.notifyStatusChange(songId, approvalStatus.toString());
+        }
     }
 
     @Override
@@ -78,5 +85,10 @@ public class SongApprovalServiceImpl implements SaveSongApprovalService, UpdateS
     public void changeStatusUploadSong(Long uploadId, ApprovalStatus approvalStatus){
         SongUpload songUpload= songUploadRepositoryPort.findByUploadId(uploadId);
         songApprovalRepositoryPort.updateStatusSong(songUpload.getSong().getSongId(), approvalStatus);
+        if (approvalStatus == ApprovalStatus.UNDER_REVIEW || 
+            approvalStatus == ApprovalStatus.APPROVED ||
+            approvalStatus == ApprovalStatus.REJECTED) {
+            sendStatusService.notifyStatusChange(songUpload.getSong().getSongId(), approvalStatus.toString());
+        }
     }
 }

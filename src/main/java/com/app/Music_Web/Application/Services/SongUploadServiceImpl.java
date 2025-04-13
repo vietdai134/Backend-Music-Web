@@ -95,12 +95,16 @@ public class SongUploadServiceImpl implements SaveSongUploadService, FindSongUpl
         UserEmail userEmail = new UserEmail(email);
         User user = userRepositoryPort.findByEmail(userEmail);
        Page<Object[]> result= songUploadRepositoryPort.findAllSongUploadWithApproveStatus(approvalStatus.toString(),user.getUserId(),pageable);
-       return result.map(objects -> SongRedisDTO.builder()
+       
+       return result.map(objects 
+       -> SongRedisDTO.builder()
         .songId((Long) objects[0])        
         .title((String) objects[1])       
         .artist((String) objects[2])       
         .songImage((String) objects[3])    
-        .uploadDate((Date) objects[4])     
+        .uploadDate((Date) objects[4]) 
+        .fileSongId((String) objects[5])  
+        .albumNames((String) objects[6])  
         .build());
     }
     

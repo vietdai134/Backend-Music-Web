@@ -34,6 +34,7 @@ public class PublicServiceImpl implements FindService{
                 .userName((String) row[6])
                 // .genres(new ArrayList<>(List.of(GenreDTO.builder().genreName((String) row[8]).build())))
                 .genresName((String)row[7])
+                .albumNames((String) row[8])
                 .build();
         });
     }

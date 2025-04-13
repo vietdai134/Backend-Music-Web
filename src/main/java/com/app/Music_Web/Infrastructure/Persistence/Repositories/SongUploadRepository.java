@@ -39,12 +39,17 @@ public interface SongUploadRepository extends JpaRepository<SongUpload,Long>,Son
 
         @Override
         @Query(value ="SELECT s.song_id, s.title as title, s.artist as artist, "+
-                "s.song_image, su.upload_date as uploadDate "+
+                "s.song_image, su.upload_date as uploadDate, s.file_song_id, "+
+                "group_concat(a.album_name) albumNames "+
                 "FROM song_upload su "+
                 "INNER JOIN song s on s.song_id = su.song_id "+
                 "INNER JOIN song_approval sa on sa.song_id = su.song_id "+
+                "LEFT JOIN album_song als on als.song_id = su.song_id "+
+                "LEFT JOIN album a on a.album_id = als.album_id "+
                 "WHERE sa.approval_status= :approvalStatus "+
-                "AND su.uploaded_by= :userId ",nativeQuery = true)
+                "AND su.uploaded_by= :userId "+
+                "GROUP BY s.song_id, s.title, s.artist, "+
+                "s.song_image, su.upload_date, s.file_song_id ",nativeQuery = true)
         Page<Object[]> findAllSongUploadWithApproveStatus(
                 @Param("approvalStatus") String approvalStatus,
                 @Param("userId") Long userId,

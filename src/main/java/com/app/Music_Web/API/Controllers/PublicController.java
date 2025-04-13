@@ -59,6 +59,7 @@ public class PublicController {
                 .uploadDate(song.getUploadDate())
                 // .downloadable(song.isDownloadable())
                 .userName(song.getUserName())
+                .albumNames(song.getAlbumNames())
                 .build());
     }
 
@@ -69,6 +70,7 @@ public class PublicController {
             @RequestParam(required = false) String artist,
             @RequestParam(required = false) List<String> genres,
             @RequestParam(required = false) String username,
+            @RequestParam(required = false) String albumName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadDate,desc") String sort) { // Thay 4 tham số bằng Pageable
@@ -82,6 +84,6 @@ public class PublicController {
         }
 
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return redisSearchService.searchSongs(songIds,title, artist, genres, username, pageable);
+        return redisSearchService.searchSongs(songIds,title, artist, genres, username,albumName, pageable);
     }
 }

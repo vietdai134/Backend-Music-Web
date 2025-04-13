@@ -18,4 +18,6 @@ public class SongRedisDTO {
     private Date uploadDate;
     private String userName; 
     private String genresName;
+
+    private String albumNames;
 }

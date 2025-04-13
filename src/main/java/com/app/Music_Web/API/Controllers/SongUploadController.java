@@ -7,18 +7,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.Music_Web.API.Request.SongRequest;
+import com.app.Music_Web.API.Request.SongRequest.SongUpdateRequest;
 import com.app.Music_Web.API.Response.PublicSongResponse;
 import com.app.Music_Web.API.Response.SongUploadResponse;
 import com.app.Music_Web.Application.DTO.SongRedisDTO;
@@ -26,9 +30,11 @@ import com.app.Music_Web.Application.DTO.SongUploadDTO;
 import com.app.Music_Web.Application.Ports.In.GoogleDrive.GoogleDriveService;
 import com.app.Music_Web.Application.Ports.In.Song.FindSongService;
 import com.app.Music_Web.Application.Ports.In.Song.SaveSongService;
+import com.app.Music_Web.Application.Ports.In.Song.UpdateSongService;
 import com.app.Music_Web.Application.Ports.In.SongApproval.SaveSongApprovalService;
 import com.app.Music_Web.Application.Ports.In.SongUpload.FindSongUploadService;
 import com.app.Music_Web.Application.Ports.In.SongUpload.SaveSongUploadService;
+import com.app.Music_Web.Application.Ports.In.WebSocket.SendStatusService;
 import com.app.Music_Web.Domain.Enums.ApprovalStatus;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
 
@@ -41,13 +47,17 @@ public class SongUploadController {
     private final SaveSongService saveSongService;
     private final SaveSongApprovalService saveSongApprovalService;
     private final SaveSongUploadService saveSongUploadService;
+    private final UpdateSongService updateSongService;
+    private final SendStatusService sendStatusService;
     public SongUploadController (
         FindSongService findSongService,
         FindSongUploadService findSongUploadService,
         GoogleDriveService googleDriveService,
         SaveSongService saveSongService,
         SaveSongApprovalService saveSongApprovalService,
-        SaveSongUploadService saveSongUploadService
+        SaveSongUploadService saveSongUploadService,
+        UpdateSongService updateSongService,
+        SendStatusService sendStatusService
     ){
         this.findSongUploadService=findSongUploadService;
         this.googleDriveService=googleDriveService;
@@ -55,6 +65,8 @@ public class SongUploadController {
         this.saveSongApprovalService=saveSongApprovalService;
         this.saveSongUploadService=saveSongUploadService;
         this.findSongService=findSongService;
+        this.updateSongService=updateSongService;
+        this.sendStatusService=sendStatusService;
 
     }
 
@@ -135,6 +147,8 @@ public class SongUploadController {
                 .artist(song.getArtist())
                 .songImage(song.getSongImage())
                 .uploadDate(song.getUploadDate())
+                .fileSongId(song.getFileSongId())
+                .albumNames(song.getAlbumNames())
                 .build());
         return ResponseEntity.ok(songResponse);
     }
@@ -189,11 +203,34 @@ public class SongUploadController {
     
             // Đợi cả hai tác vụ hoàn tất
             CompletableFuture.allOf(saveApprovalFuture, saveUploadFuture).join();
-
+            sendStatusService.notifyStatusChange(songId, status.toString());
         });
     
         // Đợi tất cả hoàn thành trước khi trả về response
         finalFuture.join();
+        
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(value = "/update/{songId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('UPLOAD_SONG')")
+    public ResponseEntity<Void> updateUploadSong(
+            @PathVariable Long songId,
+            @ModelAttribute SongUpdateRequest request) throws Exception {
+        System.out.println("Updating songId=" + songId + ", avatar=" + 
+        (request.getSongImage() != null ? request.getSongImage().getOriginalFilename() : "null"));
+        String accessToken = googleDriveService.getAccessToken();
+        String fileName = request.getArtist() + "-" + request.getTitle() + ".mp3";
+        googleDriveService.updateFileName(accessToken, request.getSongFileId(), fileName);
+
+        updateSongService.updateSong(
+                songId,
+                request.getTitle(),
+                request.getArtist(),
+                request.getSongFileId(),
+                request.getSongImage(),
+                request.getGenreNames());
+
         return ResponseEntity.ok().build();
     }
 

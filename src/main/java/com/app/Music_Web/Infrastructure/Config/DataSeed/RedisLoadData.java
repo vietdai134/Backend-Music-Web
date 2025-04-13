@@ -39,7 +39,8 @@ public class RedisLoadData implements CommandLineRunner{
                 // song.isDownloadable(),
                 song.getSongImage(),
                 song.getFileSongId(),
-                song.getUserName()
+                song.getUserName(),
+                song.getAlbumNames() != null ? song.getAlbumNames() : ""
             );
         }
 

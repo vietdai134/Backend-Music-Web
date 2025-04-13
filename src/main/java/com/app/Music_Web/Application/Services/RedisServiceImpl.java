@@ -60,8 +60,8 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
                     // .addTagField("downloadable")
                     // .addTextField("songImage", 1.0)     // Thêm nếu cần tìm kiếm
                     // .addTextField("fileSongId", 1.0)    // Thêm nếu cần tìm kiếm
-                    .addSortableTextField("userName", 1.0);     // Thêm nếu cần tìm kiếm
-
+                    .addSortableTextField("userName", 1.0)  // Thêm nếu cần tìm kiếm
+                    .addTextField("albumNames",1.0); // Thêm nếu cần tìm kiếm
             // Create index options
                 IndexOptions options = IndexOptions.defaultOptions()
                     .setDefinition(new IndexDefinition(IndexDefinition.Type.HASH)
@@ -75,32 +75,12 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
         }
     }
 
-    public String searchByTitle(String keyword) {
-        try {
-            // Create a query
-            Query query = new Query("@title:" + keyword);
-            SearchResult result = jedis.ftSearch("songIdx", query);
-            return result.toString();
-        } catch (Exception e) {
-            return "Search error: " + e.getMessage();
-        }
-    }
-
     public void addSong(String id, String title, String artist, 
                         String genre, String uploadDate, 
                         // boolean downloadable,
-                        String songImage, String fileSongId, String userName) {
+                        String songImage, String fileSongId, String userName,
+                        String albumNames) {
         String key = "song:" + id;
-        // jedis.hset(key, Map.of(
-        //         "title", title,
-        //         "artist", artist,
-        //         "genre", genre,
-        //         "uploadDate", uploadDate,
-        //         "downloadable", String.valueOf(downloadable),
-        //         "songImage", songImage,
-        //         "fileSongId", fileSongId,
-        //         "userName", userName
-        // ));
         Map<String, String> map = new HashMap<>();
         if(id != null) map.put("songId", id);
         if (title != null) map.put("title", title);
@@ -111,13 +91,15 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
         if (songImage != null) map.put("songImage", songImage);
         if (fileSongId != null) map.put("fileSongId", fileSongId);
         if (userName != null) map.put("userName", userName);
+        if (albumNames != null) map.put("albumNames", albumNames);
 
         jedis.hset(key, map);
     }
 
     @Override
-    public Page<SongRedisDTO> searchSongs(List<String> songIds,String title, String artist, 
-                List<String> genres, String username, Pageable pageable) {
+    public Page<SongRedisDTO> searchSongs(List<String> songIds,String title, 
+    String artist, List<String> genres, String username, 
+    String albumNames,Pageable pageable) {
         try {
             StringBuilder queryBuilder = new StringBuilder();
             if (songIds != null && !songIds.isEmpty()) {
@@ -148,6 +130,14 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
                 queryBuilder.append("@userName:(").append(username).append(") ");
             }
 
+            // if (albumNames != null && !albumNames.isEmpty()) {
+            //     queryBuilder.append("@albumNames:(").append(albumNames).append(") ");
+            // }
+            if (albumNames != null && !albumNames.isEmpty()) {
+                String escaped = albumNames.replaceAll("[^a-zA-Z0-9]", "\\\\$0"); // escape ký tự đặc biệt nếu cần
+                queryBuilder.append("@albumNames:\"").append(escaped).append("\" ");
+            }
+            
             // Tạo truy vấn RediSearch
             Query query = new Query(queryBuilder.toString().trim())
                     .limit((int) pageable.getOffset(), pageable.getPageSize());
@@ -168,6 +158,7 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
                 String genreString = props.getOrDefault("genre", "").toString();
+
                 songs.add(SongRedisDTO.builder()
                         .songId(Long.valueOf(doc.getId().replace("song:", "")))
                         .title((String) props.get("title"))
@@ -178,6 +169,7 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
                         .uploadDate(new Date())
                         .userName((String) props.get("userName"))
                         .genresName(genreString)
+                        .albumNames((String) props.get("albumNames"))
                         .build());
             }
 
@@ -193,11 +185,12 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
     @Override
     public void updateSong(String id, String title, String artist, String genre, String uploadDate, 
     // boolean downloadable,
-                           String songImage, String fileSongId, String userName) {
+                           String songImage, String fileSongId, String userName,
+                        String albumNames) {
         // Thực chất update giống như addSong vì Redis sẽ ghi đè
         addSong(id, title, artist, genre, uploadDate, 
         // downloadable, 
-        songImage, fileSongId, userName);
+        songImage, fileSongId, userName, albumNames);
     }
 
     @Override
@@ -214,7 +207,8 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
             addSong(String.valueOf(songRedisDTO.getSongId()), songRedisDTO.getTitle(), songRedisDTO.getArtist(), 
                 songRedisDTO.getGenresName(), String.valueOf(songRedisDTO.getUploadDate()), 
                 // songRedisDTO.isDownloadable(),
-                songRedisDTO.getSongImage(), songRedisDTO.getFileSongId(), songRedisDTO.getUserName());
+                songRedisDTO.getSongImage(), songRedisDTO.getFileSongId(), songRedisDTO.getUserName(),
+                 songRedisDTO.getAlbumNames());
         } else {
             System.out.println("Song not found with fileSongId: " + songId);
         }
@@ -227,7 +221,8 @@ public class RedisServiceImpl implements RedisSearchService,RedisUpdateService,R
             updateSong(String.valueOf(songRedisDTO.getSongId()), songRedisDTO.getTitle(), songRedisDTO.getArtist(), 
                 songRedisDTO.getGenresName(), String.valueOf(songRedisDTO.getUploadDate()), 
                 // songRedisDTO.isDownloadable(),
-                songRedisDTO.getSongImage(), songRedisDTO.getFileSongId(), songRedisDTO.getUserName());
+                songRedisDTO.getSongImage(), songRedisDTO.getFileSongId(), songRedisDTO.getUserName(),
+                songRedisDTO.getAlbumNames());
         } else {
             System.out.println("Song not found with fileSongId: " + songId);
         }

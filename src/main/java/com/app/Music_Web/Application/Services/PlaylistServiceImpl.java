@@ -120,7 +120,7 @@ public class PlaylistServiceImpl implements SavePlaylistService,
         List<PlaylistSong> playlistSongs = playlistSongRepositoryPort.findByPlaylist_PlaylistId(playlistId);
         List<PlaylistSongDTO> playlistSongDTOs = playlistSongs.stream()
                 .map(playlistSong -> PlaylistSongDTO.builder()
-                        .playlistSongId(playlistId)
+                        .playlistSongId(playlistSong.getPlaylistSongId())
                         .songId(playlistSong.getSong().getSongId())
                         .playlistId(playlistSong.getPlaylist().getPlaylistId())
                         .build())
