@@ -10,4 +10,6 @@ public interface UpdateUserService {
     UserDTO updateUser(Long userId, String userName, String email, 
                         String accountType, List<String> roleNames,
                         MultipartFile avatar)throws Exception;
+
+    void changePassword(Long userId, String newPassword);
 }

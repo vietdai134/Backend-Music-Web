@@ -225,4 +225,12 @@ public class UserServiceImpl implements RegisterService, FindUserService,
         return UserMapper.toDTO(updatedUser);
     }
 
+    @Override
+    public void changePassword(Long userId, String newPassword) {
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        user.setPassword(new UserPassword(passwordEncoder.encode(newPassword)));
+        userRepositoryPort.save(user);
+    }
+
 }

@@ -4,28 +4,42 @@ import org.springframework.stereotype.Service;
 
 import com.app.Music_Web.Application.DTO.UserAuthDTO;
 import com.app.Music_Web.Application.Ports.In.Auth.AuthService;
+import com.app.Music_Web.Application.Ports.In.Auth.ForgotPasswordService;
+import com.app.Music_Web.Application.Ports.In.Mail.MailService;
 import com.app.Music_Web.Application.Mapper.UserAuthMapper;
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
 import com.app.Music_Web.Domain.Entities.User;
 import com.app.Music_Web.Domain.Entities.UserAuth;
 import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
+import com.app.Music_Web.Domain.ValueObjects.User.UserPassword;
 import com.app.Music_Web.Infrastructure.Security.JwtUtil;
+
+import redis.clients.jedis.JedisPooled;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 import java.util.UUID;
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthService, 
+                                    ForgotPasswordService {
 
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final JedisPooled jedis;
+    private final MailService mailService;
 
-    public AuthServiceImpl (UserRepositoryPort userRepositoryPort, PasswordEncoder passwordEncoder,
-                            JwtUtil jwtUtil){
+    public AuthServiceImpl (UserRepositoryPort userRepositoryPort, 
+                            PasswordEncoder passwordEncoder,
+                            JwtUtil jwtUtil,
+                            JedisPooled jedis,
+                            MailService mailService){
         this.userRepositoryPort=userRepositoryPort;
         this.passwordEncoder=passwordEncoder;
         this.jwtUtil=jwtUtil;
+        this.jedis=jedis;
+        this.mailService=mailService;
     }
     
 
@@ -89,5 +103,43 @@ public class AuthServiceImpl implements AuthService {
         userRepositoryPort.save(user);
 
         return UserAuthMapper.toDTO(userAuth, newAccessToken); // Giữ nguyên refresh token cũ
+    }
+
+
+    @Override
+    public void sendResetLink(String email) {
+        UserEmail userEmail = new UserEmail(email);
+        User user = userRepositoryPort.findByEmail(userEmail);
+
+        String token = UUID.randomUUID().toString();
+        String redisKey = "reset:" + token;
+
+        // Lưu userId vào Redis với thời hạn 15 phút
+        jedis.setex(redisKey, 900, String.valueOf(user.getUserId()));
+
+        // In ra giả lập gửi email
+        String resetLink = "https://localhost:4200/reset-password?token=" + token;
+        System.out.println("Gửi email reset về: " + resetLink);
+        mailService.sendResetPasswordEmail(email, resetLink);
+    }
+
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        String redisKey = "reset:" + token;
+        String userIdStr = jedis.get(redisKey);
+
+        if (userIdStr == null) {
+            throw new RuntimeException("Token không hợp lệ hoặc đã hết hạn");
+        }
+
+        Long userId = Long.parseLong(userIdStr);
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        user.setPassword(new UserPassword(passwordEncoder.encode(newPassword)));
+        userRepositoryPort.save(user);
+
+        jedis.del(redisKey); // Xóa token sau khi dùng
     }
 }

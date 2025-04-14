@@ -1,6 +1,7 @@
 package com.app.Music_Web.API.Controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.Music_Web.API.Request.ChangePasswordRequest;
 import com.app.Music_Web.API.Request.RegisterRequest;
 import com.app.Music_Web.API.Request.UserRequest;
 import com.app.Music_Web.API.Response.UserResponse;
@@ -33,6 +36,8 @@ import com.app.Music_Web.Application.Ports.In.User.RegisterService;
 import com.app.Music_Web.Application.Ports.In.User.UpdateUserService;
 import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 import com.app.Music_Web.Infrastructure.Persistence.CustomUserDetails;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @RestController
@@ -42,16 +47,18 @@ public class UserController {
     private final FindUserService findUserService;
     private final DeleteUserService deleteUserService;
     private final UpdateUserService updateUserService;
-
+    private PasswordEncoder passwordEncoder;
     public UserController(
                     RegisterService registerService, 
                     FindUserService findUserService, 
                     DeleteUserService deleteUserService,
-                    UpdateUserService updateUserService) {
+                    UpdateUserService updateUserService,
+                    PasswordEncoder passwordEncoder) {
         this.registerService=registerService;
         this.findUserService=findUserService;
         this.deleteUserService=deleteUserService;
         this.updateUserService=updateUserService;
+        this.passwordEncoder=passwordEncoder;
     }
 
     @PostMapping("/register")
@@ -178,5 +185,20 @@ public class UserController {
                 request.getRoleNames(),
                 request.getAvatar());
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/getPassword")
+    public ResponseEntity<Map<String, String>> getPassword(
+        @RequestBody ChangePasswordRequest request,
+        @AuthenticationPrincipal UserDetails userDetails
+        ){
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        boolean isValid = passwordEncoder.matches(request.getOldPassword(), customUserDetails.getPassword());
+        if (isValid) { 
+            updateUserService.changePassword(customUserDetails.getUserId(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Mật khẩu đúng, mật khẩu đã được cập nhật"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Mật khẩu không đúng"));
+        }
     }
 }

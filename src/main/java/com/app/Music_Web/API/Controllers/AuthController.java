@@ -13,17 +13,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.Music_Web.API.Request.ForgotPasswordRequest;
 import com.app.Music_Web.API.Request.LoginRequest;
+import com.app.Music_Web.API.Request.ResetPasswordRequest;
 import com.app.Music_Web.Application.DTO.UserAuthDTO;
 import com.app.Music_Web.Application.Ports.In.Auth.AuthService;
+import com.app.Music_Web.Application.Ports.In.Auth.ForgotPasswordService;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
-    public AuthController(AuthService authService){
+    private final ForgotPasswordService forgotPasswordService;
+    public AuthController(
+        AuthService authService,
+        ForgotPasswordService forgotPasswordService){
         this.authService=authService;
+        this.forgotPasswordService=forgotPasswordService;
     }
 
     @PostMapping("/login")
@@ -93,5 +100,17 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(responseBody);
         }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        forgotPasswordService.sendResetLink(request.getEmail());
+        return ResponseEntity.ok(Map.of("message", "Đã gửi link reset về email nếu tồn tại"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody ResetPasswordRequest request) {
+        forgotPasswordService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công"));
+    }
 
 }
