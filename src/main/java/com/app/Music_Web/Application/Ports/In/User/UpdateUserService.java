@@ -12,4 +12,8 @@ public interface UpdateUserService {
                         MultipartFile avatar)throws Exception;
 
     void changePassword(Long userId, String newPassword);
+
+    void userUpdateImage(Long userId, MultipartFile userAvatar) 
+                        throws Exception;
+    void userUpdateInfo(Long userId, String userName) throws Exception;
 }

@@ -187,7 +187,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/getPassword")
+    @PutMapping("/changePassword")
     public ResponseEntity<Map<String, String>> getPassword(
         @RequestBody ChangePasswordRequest request,
         @AuthenticationPrincipal UserDetails userDetails
@@ -198,7 +198,30 @@ public class UserController {
             updateUserService.changePassword(customUserDetails.getUserId(), request.getNewPassword());
             return ResponseEntity.ok(Map.of("message", "Mật khẩu đúng, mật khẩu đã được cập nhật"));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Mật khẩu không đúng"));
+            // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Mật khẩu không đúng"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Mật khẩu hiện tại không đúng!"));
         }
+    }
+
+    @PutMapping("/image")
+    public ResponseEntity<Void> userUpdateImg(
+        @ModelAttribute UserRequest.UserUpdateRequest request,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) throws Exception {
+        CustomUserDetails customUserDetails= (CustomUserDetails) userDetails;
+        Long userId = customUserDetails.getUserId();
+        updateUserService.userUpdateImage(userId, request.getAvatar());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/info")
+    public ResponseEntity<Void> userUpdateInfo(
+        @RequestParam String userName,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) throws Exception{
+        CustomUserDetails customUserDetails= (CustomUserDetails) userDetails;
+        Long userId = customUserDetails.getUserId();
+        updateUserService.userUpdateInfo(userId, userName);
+        return ResponseEntity.ok().build();
     }
 }

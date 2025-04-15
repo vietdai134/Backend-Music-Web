@@ -233,4 +233,52 @@ public class UserServiceImpl implements RegisterService, FindUserService,
         userRepositoryPort.save(user);
     }
 
+
+    @Override
+    public void userUpdateImage(Long userId, MultipartFile userAvatar) 
+                        throws Exception{
+        // Tìm user theo userId
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));       
+
+        CompletableFuture<String> avatarFuture = (userAvatar != null && !userAvatar.isEmpty())
+        ? CompletableFuture.supplyAsync(() -> {
+            try {
+                // Xóa avatar cũ nếu có
+                if (user.getUserAvatar() != null && !user.getUserAvatar().isEmpty()) {
+                    String oldPublicId = cloudinaryService.extractPublicIdFromUrl(user.getUserAvatar());
+                    if (oldPublicId != null) {
+                        cloudinaryService.deleteAvatar(oldPublicId);
+                    }
+                }
+                String folder = "users/userAvatars/" + user.getUserName().getUserName();
+                return cloudinaryService.uploadAvatar(userAvatar, folder);
+            } catch (IOException e) {
+                throw new RuntimeException("Upload failed", e);
+            }
+        })
+        : CompletableFuture.completedFuture(user.getUserAvatar());
+
+        // Đợi URL ảnh và gán vào user
+        String avatarUrl = avatarFuture.get(); // Chặn ở đây để lấy URL
+        if (avatarUrl != null) {
+            user.setUserAvatar(avatarUrl);
+        }
+
+        // Lưu user đã cập nhật
+       userRepositoryPort.save(user);
+    }
+
+
+    @Override
+    public void userUpdateInfo(Long userId, String userName) throws Exception{
+        // Tìm user theo userId
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
+        // Cập nhật các thuộc tính
+        user.setUserName(new UserName(userName));
+      
+        // Lưu user đã cập nhật
+        userRepositoryPort.save(user);
+    }
 }
