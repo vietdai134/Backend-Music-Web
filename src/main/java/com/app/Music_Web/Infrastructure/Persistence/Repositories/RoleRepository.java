@@ -2,6 +2,8 @@ package com.app.Music_Web.Infrastructure.Persistence.Repositories;
 
 
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +24,7 @@ public interface RoleRepository extends JpaRepository<Role,Long>, RoleRepository
     @Query("SELECT r FROM Role r " +
            "WHERE LOWER(r.roleName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Role> searchByRoleName(@Param("keyword") String keyword,Pageable pageable);
+
+    @Override
+    Optional<Role> findById(Long roleId);
 }

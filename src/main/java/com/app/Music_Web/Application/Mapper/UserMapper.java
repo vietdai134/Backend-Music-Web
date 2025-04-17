@@ -26,6 +26,7 @@ public class UserMapper {
                            .grantedDate(userRole.getGrantedDate()) // Gán giá trị grantedDate
                            .build())
                        .collect(Collectors.toList()))
+            .authProvider(user.getAuthProvider())
             .build();
     }
 }

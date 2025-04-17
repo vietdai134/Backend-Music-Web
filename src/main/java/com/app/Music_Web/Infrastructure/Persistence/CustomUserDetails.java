@@ -9,13 +9,15 @@ public class CustomUserDetails extends User {
     private final Long userId;
     private final String userName;
     private final String email;
+    private final String authProvider;
 
     public CustomUserDetails(Long userId, String userName, String email, String password, 
-                            Collection<? extends GrantedAuthority> authorities) {
+                   String authProvider, Collection<? extends GrantedAuthority> authorities) {
         super(email, password, authorities); // email as username
         this.userId = userId;
         this.userName = userName;
         this.email = email;
+        this.authProvider=authProvider;
     }
 
     public Long getUserId() {
@@ -28,5 +30,9 @@ public class CustomUserDetails extends User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
     }
 }

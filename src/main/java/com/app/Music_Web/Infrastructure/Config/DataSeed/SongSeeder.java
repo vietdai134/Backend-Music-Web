@@ -130,7 +130,57 @@ public class SongSeeder {
                         .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743970615/songs/songImages/1bbihImLSBTE13ku6D0xeIxtlfsYRBCk_/avatar.jpg")
                         .fileSongId("1bbihImLSBTE13ku6D0xeIxtlfsYRBCk_")
                         // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Take Flight"))
+                        .artist(new SongArtist("Lindsey Stirling"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744391132/songs/songImages/1L3OAUI0ZTksL2DREZm9TDWiJglGgMtS5/avatar.jpg")
+                        .fileSongId("1L3OAUI0ZTksL2DREZm9TDWiJglGgMtS5")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Hole In The Heart"))
+                        .artist(new SongArtist("Yorushika"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744390795/songs/songImages/1gMGE187qDKu0Ha3eDsKJ_4uOOuHf64Rc/avatar.jpg")
+                        .fileSongId("1gMGE187qDKu0Ha3eDsKJ_4uOOuHf64Rc")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Charles (Arrange ver)"))
+                        .artist(new SongArtist("Hanabasami Kyo"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744390580/songs/songImages/1UVPSnL4A3BnCa4E8QeOAnLRB9FMmKJ0e/avatar.jpg")
+                        .fileSongId("1UVPSnL4A3BnCa4E8QeOAnLRB9FMmKJ0e")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Over the top"))
+                        .artist(new SongArtist("Xi"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744389292/songs/songImages/144LubUDfKC1n-hlNBva9nxnY2t8e5mCm/avatar.jpg")
+                        .fileSongId("144LubUDfKC1n-hlNBva9nxnY2t8e5mCm")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Anima"))
+                        .artist(new SongArtist("Xi"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744364173/songs/songImages/1QHm9f4-2-VBQl64WvFCCqA9olgEp2MOb/avatar.jpg")
+                        .fileSongId("1QHm9f4-2-VBQl64WvFCCqA9olgEp2MOb")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Aishite Aishite Aishite"))
+                        .artist(new SongArtist("Ado"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744363575/songs/songImages/1nTrN8K-0ZmH4FXd-Y7TQ2AfBh7qBDEbQ/avatar.jpg")
+                        .fileSongId("1nTrN8K-0ZmH4FXd-Y7TQ2AfBh7qBDEbQ")
+                        // .downloadable(true)
+                        .build(),
+                    Song.builder()
+                        .title(new SongTitle("Bloodthirsty Nightmare Lullaby"))
+                        .artist(new SongArtist("Undead Corporation"))
+                        .songImage("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744317254/songs/songImages/1PGwGdvew-iNOrVqgNO9Q85HRW0FWAVrA/avatar.jpg")
+                        .fileSongId("1PGwGdvew-iNOrVqgNO9Q85HRW0FWAVrA")
+                        // .downloadable(true)
                         .build()
+                    
                 );
 
                 songRepository.saveAll(songs);

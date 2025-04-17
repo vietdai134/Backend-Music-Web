@@ -54,5 +54,9 @@ public interface SongUploadRepository extends JpaRepository<SongUpload,Long>,Son
                 @Param("approvalStatus") String approvalStatus,
                 @Param("userId") Long userId,
                 Pageable pageable);
+
+        @SuppressWarnings("unchecked")
+        @Override
+        SongUpload save(SongUpload songUpload);
         
 }

@@ -8,17 +8,26 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.Music_Web.API.Request.ForgotPasswordRequest;
 import com.app.Music_Web.API.Request.LoginRequest;
 import com.app.Music_Web.API.Request.ResetPasswordRequest;
+import com.app.Music_Web.Application.DTO.RegisterTempData;
 import com.app.Music_Web.Application.DTO.UserAuthDTO;
 import com.app.Music_Web.Application.Ports.In.Auth.AuthService;
+import com.app.Music_Web.Application.Ports.In.Auth.CheckVerificationService;
 import com.app.Music_Web.Application.Ports.In.Auth.ForgotPasswordService;
+import com.app.Music_Web.Application.Ports.In.User.RegisterService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+import redis.clients.jedis.JedisPooled;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,11 +35,20 @@ public class AuthController {
 
     private final AuthService authService;
     private final ForgotPasswordService forgotPasswordService;
+    private final CheckVerificationService checkVerificationService;
+    private final JedisPooled jedis;
+    private final RegisterService registerService;
     public AuthController(
         AuthService authService,
-        ForgotPasswordService forgotPasswordService){
+        ForgotPasswordService forgotPasswordService,
+        JedisPooled jedis,
+        RegisterService registerService,
+        CheckVerificationService checkVerificationService){
         this.authService=authService;
         this.forgotPasswordService=forgotPasswordService;
+        this.jedis=jedis;
+        this.registerService = registerService;
+        this.checkVerificationService=checkVerificationService;
     }
 
     @PostMapping("/login")
@@ -111,6 +129,39 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> resetPassword(@RequestBody ResetPasswordRequest request) {
         forgotPasswordService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công"));
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, HttpServletRequest request) {
+        System.out.println("Verifying email with token: " + token + ", from IP: " + request.getRemoteAddr());
+        String redisKey = "register:" + token;
+        String userDataJson = jedis.get(redisKey);
+
+        if (userDataJson == null) {
+            return ResponseEntity.badRequest().body("Token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        // Lưu thông tin người dùng vào database
+        registerService.completeRegistration(userDataJson);
+
+        // Xóa dữ liệu tạm thời khỏi Redis
+        jedis.del(redisKey);
+        try {
+            RegisterTempData tempData = new ObjectMapper().readValue(userDataJson, RegisterTempData.class);
+            jedis.del("email:" + tempData.getEmail());
+        } catch (Exception e) {
+            System.out.println("Error deleting email key: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Xác minh email thành công. Bạn có thể đăng nhập.");
+    }
+
+    @GetMapping("/check-verification")
+    public ResponseEntity<Map<String, Boolean>> checkVerification(@RequestParam("email") String email) {
+        boolean isVerified = this.checkVerificationService.isEmailVerify(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isVerified", isVerified);
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -21,4 +21,6 @@ public class UserResponse {
     private List<String> permissions;
     private List<RoleDTO> roles;
     private String avatar;
+
+    private String authProvider;
 }

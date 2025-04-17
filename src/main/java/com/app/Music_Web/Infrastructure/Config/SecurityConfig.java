@@ -9,12 +9,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.app.Music_Web.Infrastructure.Security.CustomAuthenticationSuccessHandler;
 import com.app.Music_Web.Infrastructure.Security.CustomLogoutSuccessHandler;
 import com.app.Music_Web.Infrastructure.Security.JwtRequestFilter;
 
@@ -41,15 +43,28 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        CustomAuthenticationSuccessHandler successHandler) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/roles/**","/api/permissions/**").hasAuthority("SYSTEM_MANAGEMENT")
-                .requestMatchers("/api/**","/ws/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/**","/ws/**", "/swagger-ui/**", "/v3/api-docs/**",
+                                "/api/auth/login", "/api/auth/login/google").permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .redirectionEndpoint(redirection -> redirection
+                    .baseUri("/api/auth/login/google") // Xử lý callback từ Google
+                )
+                .successHandler(successHandler)
+                .failureUrl("/api/auth/login?error=true")
+                .userInfoEndpoint(userInfo -> userInfo
+                    .oidcUserService(oidcUserService()) // Lấy thông tin người dùng từ Google
+                )
             )
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
@@ -59,6 +74,11 @@ public class SecurityConfig {
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public OidcUserService oidcUserService() {
+        return new OidcUserService();
     }
 
     @Bean

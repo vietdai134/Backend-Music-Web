@@ -37,7 +37,7 @@ public class SongUploadSeeder {
                 System.out.println("Seeding initial data for upload Songs...");
 
                 List<Long> songIds = new ArrayList<>();
-                for (long i=1;i<=10;i++){
+                for (long i=1;i<=21;i++){
                     songIds.add(i);
                 }
                 User user = userRepository.findByEmail(new UserEmail("vietnguyentran134@gmail.com"));

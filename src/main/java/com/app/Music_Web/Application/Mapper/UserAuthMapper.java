@@ -7,8 +7,6 @@ public class UserAuthMapper {
     public static UserAuthDTO toDTO(UserAuth userAuth, String accessToken) {
         return UserAuthDTO.builder()
                 .authId(userAuth.getAuthId())
-                .googleId(userAuth.getGoogleId())
-                .facebookId(userAuth.getFacebookId())
                 .accessToken(accessToken)
                 .refreshToken(userAuth.getRefreshToken())
                 .refreshTokenExpiry(userAuth.getRefreshTokenExpiry())

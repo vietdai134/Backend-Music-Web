@@ -1,11 +1,14 @@
 package com.app.Music_Web.Application.Services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.app.Music_Web.Application.DTO.UserAuthDTO;
 import com.app.Music_Web.Application.Ports.In.Auth.AuthService;
+import com.app.Music_Web.Application.Ports.In.Auth.CheckVerificationService;
 import com.app.Music_Web.Application.Ports.In.Auth.ForgotPasswordService;
 import com.app.Music_Web.Application.Ports.In.Mail.MailService;
+import com.app.Music_Web.Application.Ports.In.User.RegisterService;
 import com.app.Music_Web.Application.Mapper.UserAuthMapper;
 import com.app.Music_Web.Application.Ports.Out.UserRepositoryPort;
 import com.app.Music_Web.Domain.Entities.User;
@@ -17,29 +20,35 @@ import com.app.Music_Web.Infrastructure.Security.JwtUtil;
 import redis.clients.jedis.JedisPooled;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 @Service
 public class AuthServiceImpl implements AuthService, 
-                                    ForgotPasswordService {
+                                    ForgotPasswordService,
+                                    CheckVerificationService {
 
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final JedisPooled jedis;
     private final MailService mailService;
+    private final RegisterService registerService;
 
     public AuthServiceImpl (UserRepositoryPort userRepositoryPort, 
                             PasswordEncoder passwordEncoder,
                             JwtUtil jwtUtil,
                             JedisPooled jedis,
-                            MailService mailService){
+                            MailService mailService,
+                            RegisterService registerService){
         this.userRepositoryPort=userRepositoryPort;
         this.passwordEncoder=passwordEncoder;
         this.jwtUtil=jwtUtil;
         this.jedis=jedis;
         this.mailService=mailService;
+        this.registerService= registerService;
     }
     
 
@@ -47,6 +56,9 @@ public class AuthServiceImpl implements AuthService,
     public UserAuthDTO login(String email, String password) {
         UserEmail userEmail = new UserEmail(email);
         User user = userRepositoryPort.findByEmail(userEmail);
+        if (!user.getAuthProvider().contains("LOCAL")) {
+            throw new RuntimeException("User registered with Google only, please use Google login");
+        }
         if (user == null || !passwordEncoder.matches(password, user.getPassword().getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
@@ -141,5 +153,71 @@ public class AuthServiceImpl implements AuthService,
         userRepositoryPort.save(user);
 
         jedis.del(redisKey); // Xóa token sau khi dùng
+    }
+
+
+    @Override
+    @Transactional
+    public UserAuthDTO loginWithGoogle(OidcUser oidcUser) {
+        String email = oidcUser.getEmail();
+        if (email == null) {
+            throw new RuntimeException("Email not found in Google profile");
+        }
+
+        UserEmail userEmail = new UserEmail(email);
+        User user = userRepositoryPort.findByEmail(userEmail);
+
+        // Nếu người dùng chưa tồn tại, tạo mới
+        if (user == null) {
+            registerService.registerGoogleUser(
+                oidcUser.getFullName() != null ? oidcUser.getFullName() : email, 
+                email
+            );
+            user = userRepositoryPort.findByEmail(userEmail);
+        }
+        else if (!user.getAuthProvider().contains("GOOGLE")) {
+            // Nếu email đã tồn tại nhưng chưa liên kết với Google
+            // throw new RuntimeException("Email already registered with email/password. Please link your Google account.");
+            user.setAuthProvider(user.getAuthProvider() + ",GOOGLE");
+            userRepositoryPort.save(user);
+        }
+
+    // Tạo access token
+    String accessToken = jwtUtil.generateToken(email);
+    if (user.getUserAuths() == null) {
+        user.setUserAuths(new ArrayList<>());
+    }
+    UserAuth userAuth = user.getUserAuths().stream()
+            .findFirst()
+            .orElse(null); // Lấy UserAuth đầu tiên hoặc null nếu không có
+    // Thời gian sống của refresh token là 1 phút
+    // long refreshTokenExpiryMs = 1000 * 60;
+    long refreshTokenExpiryMs = 1000L * 60 * 60 * 24; // 1 ngày
+    // Kiểm tra xem UserAuth có tồn tại và refreshToken có hết hạn không
+    if (userAuth == null || userAuth.getRefreshTokenExpiry().before(new Date())) {
+        // Nếu không có UserAuth hoặc refreshToken đã hết hạn, tạo mới
+        userAuth = UserAuth.builder()
+                .user(user)
+                .refreshToken(UUID.randomUUID().toString())
+                // .refreshTokenExpiry(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
+                .refreshTokenExpiry(new Date(System.currentTimeMillis() + refreshTokenExpiryMs)) // 1 phút
+                .build();
+        if (!user.getUserAuths().contains(userAuth)) {
+            user.getUserAuths().clear(); // Xóa UserAuth cũ nếu có
+            user.getUserAuths().add(userAuth); // Thêm UserAuth mới
+        }
+    }
+
+    userRepositoryPort.save(user);
+
+    return UserAuthMapper.toDTO(userAuth, accessToken);
+    }
+
+
+    @Override
+    public boolean isEmailVerify(String email) {
+        UserEmail userEmail = new UserEmail(email);
+        boolean isVerified = userRepositoryPort.findByEmail(userEmail) != null;
+        return isVerified;
     }
 }

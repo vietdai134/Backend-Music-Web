@@ -22,4 +22,5 @@ public class UserDTO {
     private Date createdDate;
     private String userAvatar;
     private List<RoleDTO> roles;
+    private String authProvider;
 }

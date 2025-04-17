@@ -18,4 +18,8 @@ public interface SongApprovalRepository extends JpaRepository<SongApproval,Long>
     )
     void updateStatusSong(@Param("songId") Long songId, 
                         @Param("approvalStatus") ApprovalStatus approvalStatus);
+
+        @SuppressWarnings("unchecked")
+        @Override
+        SongApproval save(SongApproval songApproval);
 }

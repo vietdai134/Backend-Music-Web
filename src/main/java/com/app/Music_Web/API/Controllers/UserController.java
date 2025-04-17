@@ -63,8 +63,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> userRegister(@RequestBody RegisterRequest request) {
-        registerService.userRegister(request.getUserName(), 
-                            request.getEmail(), request.getPassword());
+        registerService.initiateRegistration(request.getUserName(), 
+                                           request.getEmail(), 
+                                           request.getPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -102,6 +103,7 @@ public class UserController {
             .accountType(user.getAccountType().toString())
             .permissions(permissions)
             .avatar(user.getUserAvatar())
+            .authProvider(user.getAuthProvider())
             .build();
 
         return ResponseEntity.ok(userResponse);
@@ -193,6 +195,10 @@ public class UserController {
         @AuthenticationPrincipal UserDetails userDetails
         ){
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        if(customUserDetails.getPassword().isEmpty()){
+            updateUserService.changePassword(customUserDetails.getUserId(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Đã đặt mật khẩu cho tài khoản"));
+        }
         boolean isValid = passwordEncoder.matches(request.getOldPassword(), customUserDetails.getPassword());
         if (isValid) { 
             updateUserService.changePassword(customUserDetails.getUserId(), request.getNewPassword());

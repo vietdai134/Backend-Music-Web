@@ -61,6 +61,9 @@ public class User {
     @Column(nullable = false,name = "created_date")
     private Date createdDate;
 
+    @Column(name = "auth_provider", nullable = false)
+    private String authProvider;
+
     //liên kết 1-n với bảng UserPayments
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<UserPayment> userPayments;

@@ -30,4 +30,20 @@ public class MailServiceImpl implements MailService{
 
         mailSender.send(message);
     }
+
+    @Override
+    public void sendVerificationEmail(String to, String verifyLink) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Xác minh địa chỉ email");
+        message.setText(
+            "Xin chào,\n\n" +
+            "Vui lòng nhấn vào liên kết sau để xác minh tài khoản:\n" +
+            verifyLink + "\n\n" +
+            "Liên kết có hiệu lực trong 15 phút.\n\n" +
+            "Cảm ơn,\nMusic Web Team"
+        );
+        mailSender.send(message);
+    }
+    
 }

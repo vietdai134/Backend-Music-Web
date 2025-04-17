@@ -71,14 +71,6 @@ public class ListenHistoryServiceImpl implements SaveListenHistoryService,
         if(listenHistories.isEmpty()){
             return null;
         }
-        // List<ListenHistoryDTO> listenHistoryDTOs = listenHistories.stream()
-        //     .map(listenHitory -> ListenHistoryDTO.builder()
-        //                         .historyId(listenHitory.getHistoryId())
-        //                         .listenedDate(listenHitory.getListenedDate())
-        //                         .songId(listenHitory.getSong().getSongId())
-        //                         .userId(listenHitory.getUser().getUserId())
-        //                         .build()).toList();
-        // return listenHistoryDTOs;
         return listenHistories.stream()
             .map(ListenHistoryMapper::toListenHistoryDTO)
             .toList();

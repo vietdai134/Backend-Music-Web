@@ -123,7 +123,7 @@ public class SongServiceImpl implements SaveSongService, FindSongService,DeleteS
                 throw new RuntimeException("Upload failed", e);
             }
         })
-        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg");
+        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744833900/noimg_urwyb6.jpg");
         
         List<Genre> genres= genreRepositoryPort.findByGenreNameIn(genreNames);
         System.out.println("genres: " + genres);

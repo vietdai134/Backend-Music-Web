@@ -6,7 +6,6 @@ import com.app.Music_Web.Domain.Entities.User;
 import com.app.Music_Web.Domain.Entities.UserStatus;
 
 public interface UserStatusRepositoryPort {
-    UserStatus save(UserStatus userStatus);
     Optional<UserStatus> findByUser(User user);
     Optional<UserStatus> findTopByUserOrderByLastLoginDesc(User user);
     boolean existsByUserAndIsActive(User user, boolean isActive);

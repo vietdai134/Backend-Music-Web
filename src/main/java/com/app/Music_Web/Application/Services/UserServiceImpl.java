@@ -12,9 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.app.Music_Web.Application.DTO.RegisterTempData;
 import com.app.Music_Web.Application.DTO.UserDTO;
 import com.app.Music_Web.Application.Mapper.UserMapper;
 import com.app.Music_Web.Application.Ports.In.Cloudinary.CloudinaryService;
+import com.app.Music_Web.Application.Ports.In.Mail.MailService;
 import com.app.Music_Web.Application.Ports.In.User.DeleteUserService;
 import com.app.Music_Web.Application.Ports.In.User.FindUserService;
 import com.app.Music_Web.Application.Ports.In.User.RegisterService;
@@ -28,6 +30,8 @@ import com.app.Music_Web.Domain.Enums.AccountType;
 import com.app.Music_Web.Domain.ValueObjects.User.UserEmail;
 import com.app.Music_Web.Domain.ValueObjects.User.UserName;
 import com.app.Music_Web.Domain.ValueObjects.User.UserPassword;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import redis.clients.jedis.JedisPooled;
 
 @Service
 public class UserServiceImpl implements RegisterService, FindUserService,
@@ -36,38 +40,92 @@ public class UserServiceImpl implements RegisterService, FindUserService,
     private final PasswordEncoder passwordEncoder;
     private final RoleRepositoryPort roleRepositoryPort;
     private final CloudinaryService cloudinaryService;
+    private final JedisPooled jedis;
+    private final MailService mailService;
+    private final ObjectMapper objectMapper;
+
     public UserServiceImpl (UserRepositoryPort userRepositoryPort, 
                             RoleRepositoryPort roleRepositoryPort,
-                            CloudinaryService cloudinaryService){
+                            CloudinaryService cloudinaryService,
+                            JedisPooled jedis,
+                            MailService mailService,
+                            ObjectMapper objectMapper){
+        this.objectMapper = objectMapper;
         this.userRepositoryPort=userRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.cloudinaryService= cloudinaryService;
+        this.jedis=jedis;
+        this.mailService=mailService;
+    }
+    @Override
+    public void initiateRegistration(String userName, String email, String password) {
+        // Kiểm tra email đã tồn tại
+        UserEmail userEmail = new UserEmail(email);
+        if (userRepositoryPort.findByEmail(userEmail) != null) {
+            throw new RuntimeException("Email is already registered");
+        }
+
+        // Tạo token xác minh
+        String token = UUID.randomUUID().toString();
+        String redisKey = "register:" + token;
+
+        // Tạo đối tượng tạm thời để lưu vào Redis
+        RegisterTempData tempData = new RegisterTempData(userName, email, password);
+
+        try {
+            // Chuyển dữ liệu thành JSON và lưu vào Redis với thời hạn 15 phút
+            String tempDataJson = objectMapper.writeValueAsString(tempData);
+            jedis.setex(redisKey, 900, tempDataJson);
+
+            // Gửi email xác minh
+            String verifyLink = "https://localhost:8443/api/auth/verify-email?token=" + token;
+            mailService.sendVerificationEmail(email, verifyLink);
+            System.out.println("Initiating registration for email: " + email + ", token: " + token);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi lưu dữ liệu tạm thời hoặc gửi email: " + e.getMessage());
+        }
     }
 
     @Override
-    public UserDTO userRegister(String userName, String email, String password) {
-        String hashedPassword= passwordEncoder.encode(password);
-        User user = User.builder()
-                        .userName(new UserName(userName))
-                        .email(new UserEmail(email))
-                        .password(new UserPassword(hashedPassword))
-                        .accountType(AccountType.NORMAL)
-                        .createdDate(new Date())
-                        .userRoles(new ArrayList<>())
-                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg")
-                        .build();
-                        
-        Role defaultRole = roleRepositoryPort.findByRoleName("USER");
-        UserRole userRole= UserRole.builder()
-                        .user(user)
-                        .role(defaultRole)
-                        .grantedDate(new Date())
-                        .build();
-        user.getUserRoles().add(userRole);
+    public void completeRegistration(String userDataJson) {
+        try {
+            // Chuyển JSON thành đối tượng
+            RegisterTempData tempData = objectMapper.readValue(userDataJson, RegisterTempData.class);
 
-        User userRegister= userRepositoryPort.save(user);
-        return UserMapper.toDTO(userRegister);
+            // Mã hóa mật khẩu
+            String hashedPassword = passwordEncoder.encode(tempData.getPassword());
+
+            // Tạo user
+            User user = User.builder()
+                           .userName(new UserName(tempData.getUserName()))
+                           .email(new UserEmail(tempData.getEmail()))
+                           .password(new UserPassword(hashedPassword))
+                           .authProvider("LOCAL")
+                           .accountType(AccountType.NORMAL)
+                           .createdDate(new Date())
+                           .userRoles(new ArrayList<>())
+                           .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744833900/noimg_urwyb6.jpg")
+                           .build();
+
+            // Gán role mặc định
+            Role defaultRole = roleRepositoryPort.findByRoleName("USER");
+            if (defaultRole == null) {
+                throw new RuntimeException("Default role USER not found");
+            }
+
+            UserRole userRole = UserRole.builder()
+                                      .user(user)
+                                      .role(defaultRole)
+                                      .grantedDate(new Date())
+                                      .build();
+            user.getUserRoles().add(userRole);
+
+            // Lưu vào database
+            userRepositoryPort.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi lưu thông tin người dùng: " + e.getMessage());
+        }
     }
 
     @Override
@@ -82,6 +140,7 @@ public class UserServiceImpl implements RegisterService, FindUserService,
                         .email(new UserEmail(email))
                         .password(new UserPassword(hashedPassword))
                         // .accountType(AccountType.NORMAL)
+                        .authProvider("LOCAL")
                         .accountType(AccountType.valueOf(accountType.toUpperCase()))
                         .createdDate(new Date())
                         .userRoles(new ArrayList<>())
@@ -97,7 +156,7 @@ public class UserServiceImpl implements RegisterService, FindUserService,
                 throw new RuntimeException("Upload failed", e);
             }
         })
-        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1743621035/NoIMG_tmvbrh.jpg");
+        : CompletableFuture.completedFuture("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744833900/noimg_urwyb6.jpg");
 
         // Lấy danh sách các vai trò từ repository dựa trên danh sách tên vai trò
         List<Role> roles = roleRepositoryPort.findByRoleNameIn(roleNames);
@@ -229,6 +288,9 @@ public class UserServiceImpl implements RegisterService, FindUserService,
     public void changePassword(Long userId, String newPassword) {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        if (user.getPassword() == null || user.getPassword().getPassword() == null) {
+            user.setAuthProvider("LOCAL,GOOGLE");
+        }        
         user.setPassword(new UserPassword(passwordEncoder.encode(newPassword)));
         userRepositoryPort.save(user);
     }
@@ -281,4 +343,38 @@ public class UserServiceImpl implements RegisterService, FindUserService,
         // Lưu user đã cập nhật
         userRepositoryPort.save(user);
     }
+
+    @Override
+    public UserDTO registerGoogleUser(String userName, String email) {
+        UserEmail userEmail = new UserEmail(email);
+        if (userRepositoryPort.findByEmail(userEmail) != null) {
+            throw new RuntimeException("Email is already registered");
+        }
+
+        User user = User.builder()
+                        .userName(new UserName(userName))
+                        .email(userEmail)
+                        .password(null) // Không cần mật khẩu cho Google
+                        .authProvider("GOOGLE")
+                        .accountType(AccountType.NORMAL)
+                        .createdDate(new Date())
+                        .userRoles(new ArrayList<>())
+                        .userAvatar("https://res.cloudinary.com/dutcbjnyb/image/upload/v1744833900/noimg_urwyb6.jpg")
+                        .build();
+
+        Role defaultRole = roleRepositoryPort.findByRoleName("USER");
+        if (defaultRole == null) {
+            throw new RuntimeException("Default role USER not found");
+        }
+        UserRole userRole = UserRole.builder()
+                                    .user(user)
+                                    .role(defaultRole)
+                                    .grantedDate(new Date())
+                                    .build();
+        user.getUserRoles().add(userRole);
+
+        User savedUser = userRepositoryPort.save(user);
+        return UserMapper.toDTO(savedUser);
+    }
+
 }

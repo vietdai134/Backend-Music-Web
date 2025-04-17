@@ -38,4 +38,4 @@ ssl/
 ###google drive api###
 cred.json
 
-docker-compose.yml
+.env
