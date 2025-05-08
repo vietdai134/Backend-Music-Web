@@ -37,5 +37,6 @@ ssl/
 
 ###google drive api###
 cred.json
+cred.json.b64
 
 .env
