@@ -22,5 +22,9 @@ FROM eclipse-temurin:17-jdk-alpine
 # Copy file .jar đã build từ bước trước vào image
 COPY --from=builder /app/target/Music-Web-0.0.1-SNAPSHOT.jar /app.jar
 
-# Lệnh chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# # Lệnh chạy ứng dụng
+# ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENV PORT=8080
+EXPOSE 8080
+ENTRYPOINT ["java", "-Dserver.port=${PORT}", "-Xmx256m", "-Xms64m", "-jar", "/app.jar"]
+
