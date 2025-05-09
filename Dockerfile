@@ -11,7 +11,8 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Sử dụng một image JDK để chạy ứng dụng
-FROM eclipse-temurin:17-jdk-alpine
+# FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
 # Copy file .jar đã build từ bước trước vào image
 COPY --from=builder /app/target/Music-Web-0.0.1-SNAPSHOT.jar /app.jar
