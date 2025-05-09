@@ -24,11 +24,11 @@ public class GoogleCredentialsSetup {
             System.out.println("Base64 length: " + base64Credentials.length());
             System.out.println("Decoding base64 credentials...");
             byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
-            System.out.println("Writing to /app/cred.json...");
-            File credFile = new File("/app/cred.json");
-            Files.write(Paths.get("/app/cred.json"), decodedBytes);
-            System.out.println("Google credentials file saved at /app/cred.json");
+            File credFile = new File("/tmp/cred.json");
+            Files.write(Paths.get("/tmp/cred.json"), decodedBytes);
+            System.out.println("Google credentials file saved at /tmp/cred.json");
             return credFile;
+            
         } catch (Exception e) {
             System.err.println("Failed to create /app/cred.json: " + e.getMessage());
             e.printStackTrace();
