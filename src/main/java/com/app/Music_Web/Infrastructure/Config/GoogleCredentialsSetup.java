@@ -1,31 +1,30 @@
 package com.app.Music_Web.Infrastructure.Config;
 
-import java.util.Base64;
+import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 
+@Component
 public class GoogleCredentialsSetup {
 
-    public static void setupCredentials() {
+    @PostConstruct
+    public void setupCredentials() {
         try {
-            // Lấy chuỗi base64 từ biến môi trường
             String base64Credentials = System.getenv("GOOGLE_CREDENTIALS_BASE64");
-
             if (base64Credentials == null || base64Credentials.isEmpty()) {
-                System.out.println("No base64 credentials found in environment variable!");
-                return;
+                System.err.println("Error: GOOGLE_CREDENTIALS_BASE64 is missing or empty");
+                throw new IllegalStateException("GOOGLE_CREDENTIALS_BASE64 is required");
             }
-
-            // Giải mã chuỗi base64 thành byte[]
+            // Remove any whitespace or newlines
+            base64Credentials = base64Credentials.trim();
             byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
-
-            // Lưu nội dung vào file cred.json
             Files.write(Paths.get("/app/cred.json"), decodedBytes);
-
-            System.out.println("Google credentials file saved successfully!");
+            System.out.println("Google credentials file saved at /app/cred.json");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Failed to create /app/cred.json: " + e.getMessage());
+            throw new RuntimeException("Failed to create cred.json", e);
         }
     }
 }
-

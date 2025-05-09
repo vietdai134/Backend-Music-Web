@@ -13,7 +13,8 @@ public class MusicWebApplication {
 
 	public static void main(String[] args) {
 		// Setup Google Credentials
-        GoogleCredentialsSetup.setupCredentials();
+		GoogleCredentialsSetup googleCredentialsSetup = new GoogleCredentialsSetup();
+		googleCredentialsSetup.setupCredentials();
 		// Start the Spring Boot application
 		SpringApplication.run(MusicWebApplication.class, args);
 	}
